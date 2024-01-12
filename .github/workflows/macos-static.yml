@@ -3,19 +3,13 @@ on:
   push:
     paths:
       - '*.txt'
-      - '*.qml'
-      - '*.cpp'
-      - '*.h'
-      - '*.hpp'
+      - 'app_source/**'
       - 'scripts/**'
       - '.github/workflows/macos-static.yml'
   pull_request:
     paths:
       - '*.txt'
-      - '*.qml'
-      - '*.cpp'
-      - '*.h'
-      - '*.hpp'
+      - 'app_source/**'
       - 'scripts/**'
       - '.github/workflows/macos-static.yml' 
       
@@ -59,19 +53,19 @@ jobs:
       - name: package
         run: |
           # 拷贝依赖
-          macdeployqt /Users/runner/work/ProtocolParser/ProtocolParser/build/${targetName}.app -qmldir=. -verbose=1 -dmg     
+          macdeployqt /Users/runner/work/ProtocolParser/ProtocolParser/build/app_source/${targetName}.app -qmldir=. -verbose=1 -dmg     
           
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ env.targetName }}_${{ matrix.os }}_${{matrix.qt_ver}}_static.zip
-          path: /Users/runner/work/ProtocolParser/ProtocolParser/build/${{ env.targetName }}.dmg
+          path: /Users/runner/work/ProtocolParser/ProtocolParser/build/app_source/${{ env.targetName }}.dmg
           
       - name: uploadRelease
         if: startsWith(github.event.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: /Users/runner/work/ProtocolParser/ProtocolParser/build/${{ env.targetName }}.dmg
+          file: /Users/runner/work/ProtocolParser/ProtocolParser/build/app_source/${{ env.targetName }}.dmg
           asset_name: ${{ env.targetName }}_${{  github.ref_name }}_${{ matrix.os }}_Qt${{ matrix.qt_ver }}_static.dmg
           tag: ${{ github.ref }}
           overwrite: true

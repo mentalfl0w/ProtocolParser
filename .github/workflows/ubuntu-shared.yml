@@ -4,19 +4,13 @@ on:
   push:
     paths:
       - '*.txt'
-      - '*.qml'
-      - '*.cpp'
-      - '*.h'
-      - '*.hpp'
+      - 'app_source/**'
       - 'scripts/**'
       - '.github/workflows/ubuntu-shared.yml'
   pull_request:
     paths:
       - '*.txt'
-      - '*.qml'
-      - '*.cpp'
-      - '*.h'
-      - '*.hpp'
+      - 'app_source/**'
       - 'scripts/**'
       - '.github/workflows/ubuntu-shared.yml'
       
@@ -30,7 +24,7 @@ jobs:
         qt_ver: [6.2.4]
         qt_arch: [gcc_64]
     env:
-      targetName: ProtocolParser
+      targetName: Protocol-Parser
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -74,7 +68,7 @@ jobs:
           # make sure Qt plugin finds QML sources so it can deploy the imported files
           export QML_SOURCES_PATHS=./
           # 拷贝依赖
-          linuxdeploy-x86_64.AppImage --plugin=qt --output=appimage --create-desktop-file --icon-file=${targetName}.svg --executable=/home/runner/work/ProtocolParser/ProtocolParser/build/${targetName} --appdir /home/runner/work/ProtocolParser/ProtocolParser/build/
+          linuxdeploy-x86_64.AppImage --plugin=qt --output=appimage --create-desktop-file --icon-file=${targetName}.svg --executable=/home/runner/work/ProtocolParser/ProtocolParser/build/app_source/${targetName} --appdir /home/runner/work/ProtocolParser/ProtocolParser/build/app_source/
           mv ${{ env.targetName }}-*.AppImage ${{ env.targetName }}_${{ matrix.os }}_${{matrix.qt_ver}}_shared.AppImage
         
       - uses: actions/upload-artifact@v2
