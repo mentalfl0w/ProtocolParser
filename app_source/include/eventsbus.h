@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QJsonObject>
-#include "3rdparty/RibbonUI/lib_source/definitions.h"
+#include "../3rdparty/RibbonUI/lib_source/definitions.h"
 
 class Event : public QObject
 {

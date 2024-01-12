@@ -7,7 +7,7 @@
 #include <QJsonObject>
 #include <QQueue>
 #include <zigbeeframe.h>
-#include "3rdparty/RibbonUI/lib_source/definitions.h"
+#include "../3rdparty/RibbonUI/lib_source/definitions.h"
 #include "protocol.h"
 #include "eventsbus.h"
 #include "config.h"

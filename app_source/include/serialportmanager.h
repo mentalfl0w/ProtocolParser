@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QSerialPort>
 #include "DLLN3X.h"
-#include "3rdparty/RibbonUI/lib_source/definitions.h"
+#include "../3rdparty/RibbonUI/lib_source/definitions.h"
 #include "zigbeeparser.h"
 #include "eventsbus.h"
 

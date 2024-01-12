@@ -17,8 +17,8 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_WIN
     FramelessConfig::instance()->set(Global::Option::ForceHideWindowFrameBorder);
+    FramelessConfig::instance()->set(Global::Option::ForceNonNativeBackgroundBlur);
 #endif
-    FramelessConfig::instance()->set(Global::Option::DisableLazyInitializationForMicaMaterial);
     FramelessConfig::instance()->set(Global::Option::CenterWindowBeforeShow);
     FramelessConfig::instance()->set(Global::Option::EnableBlurBehindWindow);
 
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 #ifdef RIBBONUI_BUILD_STATIC_LIB
     engine.addImportPath("qrc:/");
 #endif
-    const QUrl url(u"qrc:/ProtocolParser/Main.qml"_qs);
+    const QUrl url(u"qrc:/ProtocolParser/qml/Main.qml"_qs);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
         &app, [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)
