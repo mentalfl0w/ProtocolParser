@@ -141,9 +141,9 @@ void sm3_z(u8 *id, u32 idlen, ecc_point *pub, u8 *hash)
 	u8 x[ECC_NUMWORD];
 	u8 y[ECC_NUMWORD];
 	u8 idlen_char[2];
-	struct sm3_ctx md[1];
+    struct sm3_ctx md[1];
 
-	put_unaligned_be16(idlen<<3, idlen_char);
+    put_unaligned_be16(idlen<<3, idlen_char);
 
 	ecc_bytes2native((u64*)a, sm2_curve.a, sm2_curve.ndigits);
 	ecc_bytes2native((u64*)b, sm2_curve.b, sm2_curve.ndigits);

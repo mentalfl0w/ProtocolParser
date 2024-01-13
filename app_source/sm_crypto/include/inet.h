@@ -27,7 +27,30 @@ u16 cpu_to_be16(u16 data);
 u32 cpu_to_be32(u32 data);
 u64 be64_to_cpu(u64 data);
 u64 cpu_to_be64(u64 data);
-
+u16 __get_unaligned_le16(const u8 *p);
+u32 __get_unaligned_le32(const u8 *p);
+u64 __get_unaligned_le64(const u8 *p);
+void __put_unaligned_le16(u16 val, u8 *p);
+void __put_unaligned_le32(u32 val, u8 *p);
+void __put_unaligned_le64(u64 val, u8 *p);
+u16 get_unaligned_le16(const void *p);
+u32 get_unaligned_le32(const void *p);
+u64 get_unaligned_le64(const void *p);
+void put_unaligned_le16(u16 val, void *p);
+void put_unaligned_le32(u32 val, void *p);
+void put_unaligned_le64(u64 val, void *p);
+u16 __get_unaligned_be16(const u8 *p);
+u32 __get_unaligned_be32(const u8 *p);
+u64 __get_unaligned_be64(const u8 *p);
+void __put_unaligned_be16(u16 val, u8 *p);
+void __put_unaligned_be32(u32 val, u8 *p);
+void __put_unaligned_be64(u64 val, u8 *p);
+u16 get_unaligned_be16(const void *p);
+u32 get_unaligned_be32(const void *p);
+u64 get_unaligned_be64(const void *p);
+void put_unaligned_be16(u16 val, void *p);
+void put_unaligned_be32(u32 val, void *p);
+void put_unaligned_be64(u64 val, void *p);
 
 #ifdef __cplusplus
 }

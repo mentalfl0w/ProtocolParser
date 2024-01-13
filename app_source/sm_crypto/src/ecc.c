@@ -191,10 +191,12 @@ void ecc_point_mult(struct ecc_curve *curve, ecc_point *result, ecc_point *point
 	vli_set(result->y, Ry[0], curve->ndigits);
 }
 
+#ifndef _MSC_VER
 static u32 max(u32 a, u32 b)
 {
-        return (a > b ? a : b);
+    return (a > b ? a : b);
 }
+#endif
 
 void ecc_point_mult2(struct ecc_curve *curve, ecc_point *result, ecc_point *g, ecc_point *p, u64 *s, u64 *t)
 {
