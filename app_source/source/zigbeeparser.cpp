@@ -144,12 +144,12 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
                     if (_protocol->bytecmp(hframe->hmac,hmac,32))
                     {
                         zigbee_protocol::ZigbeeFrame zf(0x82,0x82,node->first.addr);
-                        new_data_frame(16) data;
-                        memset(&data, 0, sizeof(data));
-                        _protocol->protocal_wrapper((data_frame *)&data, 0, 16, (u8*)latest_key.data(), 0);
-                        new_crypto_zdata_frame(48) zdata;
+                        new_data_frame(16) dframe;
+                        memset(&dframe, 0, sizeof(dframe));
+                        _protocol->protocal_wrapper((data_frame *)&dframe, 0, 16, (u8*)latest_key.data(), 0);
+                        new_crypto_zdata_frame(sizeof(dframe)) zdata;
                         memset(&zdata, 0, sizeof(zdata));
-                        _protocol->zigbee_data_encrypt((data_frame *)&data, (crypto_zdata_frame *)&zdata, Crypto::SM4_encrypt, key_str);
+                        _protocol->zigbee_data_encrypt((data_frame *)&dframe, (crypto_zdata_frame *)&zdata, Crypto::SM4_encrypt, key_str);
                         new_base_frame(48 + BASE_FRAME_PREFIX_LEN) bframe;
                         memset(&bframe, 0, sizeof(bframe));
                         _protocol->base_frame_maker(&zdata, (base_frame *)&bframe, node->first.addr, &node->second);
@@ -213,25 +213,53 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
     }
     case 0x83:
     {
-        zigbee_protocol::ZigbeeFrame dzf = zframe;
-        new_data_frame(72) ndata;
         QJsonObject object;
-        if (*(u16 *)frame == CRYPTO_ZDATA_FRAME_HEAD)
+        if (node->first.verified)
         {
-            czdata = (crypto_zdata_frame*)frame;
-            _protocol->zigbee_data_dectypt((data_frame*)&ndata, czdata, Crypto::SM4_encrypt);
-            dzf.setData((char*)&ndata,ndata.data_length + DATA_FRAME_PREFIX_LEN);
-            zdata = QByteArray((char *)dzf.data(), dzf.size());
-            object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
+            zigbee_protocol::ZigbeeFrame dzf = zframe;
+            new_data_frame(72) ndata;
+            if (*(u16 *)frame == CRYPTO_ZDATA_FRAME_HEAD)
+            {
+                czdata = (crypto_zdata_frame*)frame;
+                _protocol->zigbee_data_dectypt((data_frame*)&ndata, czdata, Crypto::SM4_encrypt);
+                dzf.setData((char*)&ndata,ndata.data_length + DATA_FRAME_PREFIX_LEN);
+                zdata = QByteArray((char *)dzf.data(), dzf.size());
+                object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
+            }
+            object.insert("sender", sender);
+            object.insert("text",QJsonValue(QString(zdata.toHex(' ').toUpper())));
+            object.insert("note_text",QJsonValue("收到节点0x"+sender+"发送的数据"));
+            object.insert("recieved", true);
+            object.insert("type","zigbee_recv_data");
+            if (QRandomGenerator::global()->bounded(2) && is_demo)
+                object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
+            _bus->push_data("zigbee_recv_data_view",object);
         }
-        object.insert("sender", sender);
-        object.insert("text",QJsonValue(QString(zdata.toHex(' ').toUpper())));
-        object.insert("note_text",QJsonValue("收到节点0x"+sender+"发送的数据"));
-        object.insert("recieved", true);
-        object.insert("type","zigbee_recv_data");
-        if (QRandomGenerator::global()->bounded(2) && is_demo)
-            object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
-        _bus->push_data("zigbee_recv_data_view",object);
+        else
+        {
+            object.insert("sender", sender);
+            object.insert("text",QJsonValue(QString(zdata.toHex(' ').toUpper())));
+            object.insert("note_text",QJsonValue("收到节点0x"+sender+"发送的数据,但节点并未认证"));
+            object.insert("recieved", true);
+            object.insert("type","zigbee_recv_data");
+            _bus->push_data("zigbee_recv_data_view",object);
+            node->second.id=0;
+            new_data_frame(50) dframe;
+            memset(&dframe,0,sizeof (dframe));
+            _protocol->protocal_wrapper((data_frame *)&dframe, 0, 5, (u8 *)"RESET", false);
+            new_base_frame(50 + BASE_FRAME_PREFIX_LEN) bframe;
+            memset(&bframe, 0, sizeof(bframe));
+            _protocol->base_frame_maker(&dframe, (base_frame *)&bframe, node->first.addr,&node->second);
+            zigbee_protocol::ZigbeeFrame zf(0x83,0x83,node->first.addr,(char *)&bframe,bframe.length);
+            QByteArray zfdata((char *)zf.data(),zf.size());
+            QJsonObject object;
+            object.insert("sender", QString::number(SELF_ADDR,16).toUpper());
+            object.insert("text",QJsonValue(QString(zfdata.toHex(' ').toUpper())));
+            object.insert("note_text",QJsonValue("向节点0x"+sender+"发送重置命令"));
+            object.insert("recieved", false);
+            object.insert("type","zigbee_recv_data");
+            _bus->push_data("zigbee_recv_data_view",object);
+        }
     }
     default:
         break;
