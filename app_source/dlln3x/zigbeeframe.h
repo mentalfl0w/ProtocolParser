@@ -163,6 +163,8 @@ public:
     void load_package(QList<uint8_t>& buf) { load_package(buf.constData(), buf.size()); };
     void load_package(const uint8_t* buf, uint8_t length)
     {
+        if (length < 7) // len < 7 means pkg is corrupted
+            return;
         _packed_data.clear();
         for (uint8_t i = 0; i < length; i++) {
             _package.append(buf[i]);

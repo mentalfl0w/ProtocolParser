@@ -143,12 +143,8 @@ Item{
                         {
                             deny.push(ZigBeeParser.wait_queue[list.current_index])
                             ZigBeeParser.deny_list = deny
-                            for (var i = 0; i < ZigBeeParser.wait_queue.length; i++)
-                            {
-                                if (i === list.current_index)
-                                    continue
-                                data.push(ZigBeeParser.wait_queue[i])
-                            }
+                            data = ZigBeeParser.wait_queue
+                            data.splice(list.current_index,1)
                             ZigBeeParser.wait_queue = data
                             break
                         }
@@ -156,12 +152,8 @@ Item{
                         {
                             deny.push(ZigBeeParser.allow_list[list.current_index])
                             ZigBeeParser.deny_list = deny
-                            for (let i = 0; i < ZigBeeParser.allow_list.length; i++)
-                            {
-                                if (i === list.current_index)
-                                    continue
-                                data.push(ZigBeeParser.allow_list[i])
-                            }
+                            data = ZigBeeParser.allow_list
+                            data.splice(list.current_index,1)
                             ZigBeeParser.allow_list = data
                             break
                         }
@@ -170,13 +162,8 @@ Item{
                             let allow = ZigBeeParser.allow_list
                             allow.push(ZigBeeParser.deny_list[list.current_index])
                             ZigBeeParser.allow_list = allow
-                            let data = []
-                            for (let i = 0; i < ZigBeeParser.deny_list.length; i++)
-                            {
-                                if (i === list.current_index)
-                                    continue
-                                data.push(ZigBeeParser.deny_list[i])
-                            }
+                            data = ZigBeeParser.deny_list
+                            data.splice(list.current_index,1)
                             ZigBeeParser.deny_list = data
                             break
                         }
@@ -196,37 +183,22 @@ Item{
                         let allow = ZigBeeParser.allow_list
                         allow.push(ZigBeeParser.wait_queue[list.current_index])
                         ZigBeeParser.allow_list = allow
-                        var data = []
-                        for (var i = 0; i < ZigBeeParser.wait_queue.length; i++)
-                        {
-                            if (i === list.current_index)
-                                continue
-                            data.push(ZigBeeParser.wait_queue[i])
-                        }
+                        var data = ZigBeeParser.wait_queue
+                        data.splice(list.current_index,1)
                         ZigBeeParser.wait_queue = data
                         break
                     }
                     case 1:
                     {
-                        let data = []
-                        for (let i = 0; i < ZigBeeParser.allow_list.length; i++)
-                        {
-                            if (i === list.current_index)
-                                continue
-                            data.push(ZigBeeParser.allow_list[i])
-                        }
+                        let data = ZigBeeParser.allow_list
+                        data.splice(list.current_index,1)
                         ZigBeeParser.allow_list = data
                         break
                     }
                     case 2:
                     {
-                        let data = []
-                        for (let i = 0; i < ZigBeeParser.deny_list.length; i++)
-                        {
-                            if (i === list.current_index)
-                                continue
-                            data.push(ZigBeeParser.deny_list[i])
-                        }
+                        let data = ZigBeeParser.deny_list
+                        data.splice(list.current_index,1)
                         ZigBeeParser.deny_list = data
                         break
                     }

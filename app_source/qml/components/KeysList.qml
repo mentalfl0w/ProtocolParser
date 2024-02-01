@@ -111,13 +111,8 @@ Item {
                 text: qsTr("删除")
                 enabled: list.has_selected
                 onClicked: {
-                    let data = []
-                    for (let i = 0; i < ZigBeeParser.pre_hmac_verify_key.length; i++)
-                    {
-                        if (i === list.current_index)
-                            continue
-                        data.push(ZigBeeParser.pre_hmac_verify_key[i])
-                    }
+                    let data = ZigBeeParser.pre_hmac_verify_key
+                    data.splice(list.current_index,1)
                     ZigBeeParser.pre_hmac_verify_key = data
                 }
             }
