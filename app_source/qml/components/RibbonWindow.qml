@@ -25,6 +25,8 @@ Window {
             FramelessHelper.setSystemButton(titleBar.maximizeBtn, FramelessHelperConstants.Maximize);
             FramelessHelper.setSystemButton(titleBar.closeBtn, FramelessHelperConstants.Close);
         }
+        FramelessHelper.setHitTestVisible(titleBar.left_container)
+        FramelessHelper.setHitTestVisible(titleBar.right_container)
         FramelessHelper.titleBarItem = titleBar;
         FramelessHelper.moveWindowToDesktopCenter();
         window.visible = true;
