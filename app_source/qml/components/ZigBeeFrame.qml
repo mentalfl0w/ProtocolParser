@@ -11,13 +11,12 @@ Flow{
     property bool dark_mode: RibbonTheme.dark_mode
     property bool show_tooltip: true
     property bool is_recieved: false
-    property double padding: 5
     property int font_size: 13
     property double component_width: 300
     property int data_width: component_width - (show_text ? label.width : 0) - z_head.width - z_length.width - z_src_port.width -
                              z_des_port.width - z_address.width - z_tail.width - spacing*(show_text ? 13 : 12) - 6
     property var data_list
-
+    padding: 5
 
     RibbonText {
         id: label
