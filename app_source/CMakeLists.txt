@@ -31,6 +31,12 @@ set(
 INCLUDE_DIRECTORIES(dlln3x include)
 add_subdirectory(sm_crypto)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/app/debug)
+else()
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/app/release)
+endif()
+
 if (WIN32)
     set(app_icon_resource_windows resources/icon.rc)
     qt_add_executable(${PROJECT_NAME}
@@ -48,7 +54,7 @@ if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${DLL_FILES}
-        "${CMAKE_BINARY_DIR}${PATH_SEPARATOR}app_source"
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     )
 elseif(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE AppIcon)
