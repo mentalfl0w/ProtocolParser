@@ -11,7 +11,7 @@ RibbonWindow {
     id:root
     width: 1200
     height: 800
-    title: qsTr("Protocol Parser")
+    title: qsTr("Protocol Parser") + ` V${PPAPP_Version}`
 
     TabBar{
         id: tab_bar

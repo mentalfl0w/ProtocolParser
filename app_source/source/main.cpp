@@ -4,6 +4,7 @@
 #include <FramelessHelper/Quick/framelessquickmodule.h>
 #include <FramelessHelper/Core/private/framelessconfig_p.h>
 #include <QTranslator>
+#include <QQmlContext>
 
 FRAMELESSHELPER_USE_NAMESPACE
 #ifdef RIBBONUI_BUILD_STATIC_LIB
@@ -28,6 +29,9 @@ int main(int argc, char *argv[])
         app.installTranslator(&translator);
     QQmlApplicationEngine engine;
     FramelessHelper::Quick::registerTypes(&engine);
+    QList<int> verl = {PROTOCOLPARSER_VERSION};
+    QString version = QString::number(verl[0])+'.'+QString::number(verl[1])+'.'+QString::number(verl[2]);
+    engine.rootContext()->setContextProperty("PPAPP_Version",version);
 #ifdef RIBBONUI_BUILD_STATIC_LIB
     engine.addImportPath("qrc:/");
 #endif
