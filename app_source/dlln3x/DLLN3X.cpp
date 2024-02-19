@@ -64,6 +64,7 @@ bool DLLN3X::send(ZigbeeFrame zf)
     if (zf.getSrcPort() < 0x80)
         return false;
     status = _DSerial->write((char *)zf.data(),zf.size());
+    status = _DSerial->flush();
     return status;
 }
 
@@ -231,7 +232,7 @@ uint16_t DLLN3X::rw_config(CONFIG arg, uint16_t data, CONFIG_RW_MASK mask)
     }
     case CONFIG::BAUDRATE: {
         if (zf.getData()[0] != 0x24) {
-           if (zf.getData()[0] != CONFIG_RESPONSE::DONE)
+            if (zf.getData()[0] != CONFIG_RESPONSE::DONE)
             {
                 printf("DLLN3X write config error: 0x");
                 printf("%X\n", zf.getData()[0]);
@@ -304,25 +305,22 @@ int DLLN3X::readBytesUntil(uint8_t delimiter, uint8_t* buffer, qint64 maxSize)
     QByteArray data;
     qint64 bytesRead = 0;
 
-    while (bytesRead < maxSize)
-    {
-        if (_DSerial->bytesAvailable())
+    if (_DSerial->bytesAvailable() || _DSerial->waitForReadyRead(2000))
+        while (bytesRead < maxSize)
         {
             qint64 bytesReadNow = _DSerial->read((char *)(buffer) + bytesRead, 1);
             bytesRead += bytesReadNow;
 
             data.append((char *)(buffer) + bytesRead - bytesReadNow, bytesReadNow);
 
-            if (data.contains(delimiter))
+            if (data.contains(delimiter) || !(_DSerial->waitForReadyRead(20) || _DSerial->bytesAvailable()))
             {
                 break;
             }
+
         }
-        else
-        {
-            break;
-        }
-    }
+    else
+        qDebug()<<"DL-LN3X: Read byte timeout!";
     return bytesRead;
 }
 

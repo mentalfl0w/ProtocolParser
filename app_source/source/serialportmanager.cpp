@@ -122,7 +122,7 @@ bool SerialPortManager::open(QString port_name, QString baudrate, QString databi
             {
                 _serial_port.setStopBits( QSerialPort::TwoStop ); // 设置停止位(停止位为2)
             }
-            _serial_port.setFlowControl( QSerialPort::HardwareControl ); // 设置流控制(硬件数据流控制)
+            _serial_port.setFlowControl( QSerialPort::NoFlowControl ); // 设置流控制(无数据流控制)
             // 当下位机中有数据发送过来时就会响应这个槽函数
             connect(&_serial_port,&QSerialPort::readyRead,this,&SerialPortManager::_ready_for_read);
             connect(&_serial_port,&QSerialPort::aboutToClose,this,&SerialPortManager::close);
@@ -156,7 +156,11 @@ QByteArray SerialPortManager::read()
     if (_opened && _handledBymanager)
     {
         readyRead(false);
-        bdata = _serial_port.readAll();
+        while(true){
+            bdata += _serial_port.readAll();
+            if (!_serial_port.waitForReadyRead(20))
+                break;
+        }
         if (_recv_hex)
         {
             return bdata.toHex(' ').toUpper();
@@ -217,7 +221,9 @@ bool SerialPortManager::write(QString data)
     default:
         break;
     }
-    return _serial_port.write(bdata);
+    bool status = _serial_port.write(bdata);
+    status = _serial_port.flush();
+    return status;
 }
 
 void  SerialPortManager::zigbee_callback(zigbee_protocol::ZigbeeFrame zframe)
