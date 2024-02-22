@@ -4,7 +4,7 @@
 #include "zigbeeframe.h"
 #include "config.h"
 
-#define SELF_ADDR 0xEEEE //按照实际修改
+#define DEFAULT_SELF_ADDR 0xEEEE //按照实际修改
 
 namespace zigbee_protocol {
 class Protocol
@@ -31,6 +31,7 @@ public:
                         QString en_key = "");
     QString hmac_verify_key = "11223344556677888877665544332211";
     QStringList pre_hmac_verify_key;
+    u16 self_addr = DEFAULT_SELF_ADDR;
 private:
     Protocol();
     ~Protocol();

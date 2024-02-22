@@ -26,6 +26,7 @@ SerialPortManager::SerialPortManager(QObject *parent)
         if (!_handledBymanager && _serial_port.isOpen())
         {
             _zigbee->init(&_serial_port, _serial_port.baudRate());
+            zigbee_protocol::Protocol::getInstance()->self_addr = _zigbee->read_addr();
             connect(_zigbee, &zigbee_protocol::DLLN3X::recved, this, &SerialPortManager::zigbee_callback);
         }
         else
@@ -192,7 +193,7 @@ bool SerialPortManager::write(QString data)
         for (auto item : td)
             bdata += QByteArray::fromHex(item.toLatin1());
 
-        zigbee_protocol::ZigbeeFrame zf(bdata[2],bdata[3],(uint16_t)bdata[4] | bdata[5]<<8, bdata.data()+6,bdata.length()-7);
+        zigbee_protocol::ZigbeeFrame zf(bdata[2],bdata[3],*(uint16_t*)(bdata.data()+4), bdata.data()+6,bdata.length()-7);
 
         return _zigbee->send(zf);
     }

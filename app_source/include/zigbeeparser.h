@@ -25,7 +25,7 @@ class ZigBeeParser : public QObject
     Q_PROPERTY(QString hmac_verify_key READ hmac_verify_key WRITE setHmac_verify_key NOTIFY hmac_verify_keyChanged FINAL)
     Q_PROPERTY(QStringList pre_hmac_verify_key READ pre_hmac_verify_key WRITE setPre_hmac_verify_key NOTIFY pre_hmac_verify_keyChanged FINAL)
 public:
-    Q_INVOKABLE QString self_addr(){ return _self_addr;};
+    Q_INVOKABLE QString self_addr(){ _self_addr = QString::number(_protocol->self_addr,16).toUpper(); return _self_addr;};
     QString hmac_verify_key(){ return _protocol->hmac_verify_key;};
     void setHmac_verify_key(QString key){ _config->Set("Protocol","hmac_verify_key",key); _protocol->hmac_verify_key = key;emit hmac_verify_keyChanged();};
     QStringList pre_hmac_verify_key(){ return _protocol->pre_hmac_verify_key;};
@@ -47,7 +47,7 @@ private:
     Event _event;
     EventsBus *_bus = nullptr;
     zigbee_protocol::Protocol* _protocol = nullptr;
-    QString _self_addr = QString::number(SELF_ADDR,16).toUpper();
+    QString _self_addr = QString::number(DEFAULT_SELF_ADDR,16).toUpper();
     Config* _config = nullptr;
 };
 #endif // ZIGBEEPARSER_H

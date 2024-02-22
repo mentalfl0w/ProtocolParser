@@ -113,7 +113,7 @@ void Protocol::base_frame_maker(void *in_frame, base_frame *out_frame, u16 dest_
 
 bool Protocol::base_frame_parser(base_frame *in_frame, void **out_frame , device *dev)
 {
-    if (in_frame->des_addr == SELF_ADDR && (dev->id == 0||in_frame->reset_num==0xDD||((in_frame->id > dev->id && in_frame->id<=BASE_FRAME_RESET_NUM))))
+    if (in_frame->des_addr == self_addr && (dev->id == 0||in_frame->reset_num==0xDD||((in_frame->id > dev->id && in_frame->id<=BASE_FRAME_RESET_NUM))))
     {
         dev->addr = in_frame->ori_addr;
         dev->id = in_frame->id;

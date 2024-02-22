@@ -253,7 +253,7 @@ Flow{
         }
 
         RibbonToolTip{
-            text: "ZigBee帧 源地址"
+            text: `ZigBee帧 源地址, 采用小端序，实际地址为0x${data_list[5]}${data_list[4]}`
             visible: z_address_hh.hovered && control.show_tooltip
         }
 

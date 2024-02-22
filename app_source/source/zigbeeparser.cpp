@@ -63,7 +63,7 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
     QPair<device,device>* node = nullptr;
     memset(&temp,0,sizeof(temp));
     memset(&temp,0,sizeof(self));
-    self.addr = SELF_ADDR;
+    self.addr = _protocol->self_addr;
     if (!nodes.contains(((base_frame *)zframe.getData().data())->ori_addr))
     {
         temp.addr=((base_frame *)zframe.getData().data())->ori_addr;
@@ -75,7 +75,7 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
     }
     node = &nodes[((base_frame *)zframe.getData().data())->ori_addr];
     bframe = (base_frame*)zframe.getData().data();
-    if (is_demo || bframe->des_addr == SELF_ADDR && (node->first.id == 0||bframe->reset_num==0xDD||((bframe->id > node->first.id && bframe->id<=BASE_FRAME_RESET_NUM))))
+    if (is_demo || bframe->des_addr == _protocol->self_addr && (node->first.id == 0||bframe->reset_num==0xDD||((bframe->id > node->first.id && bframe->id<=BASE_FRAME_RESET_NUM))))
     {
         node->first.addr = bframe->ori_addr;
         node->first.id = bframe->id;
@@ -126,7 +126,7 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
                 object.insert("text",QJsonValue(QString(zdata.toHex(' ').toUpper())));
                 object.insert("note_text",QJsonValue("向0x"+QString::number(node->first.addr,16).toUpper()+"节点发送验证通过回复信息"));
                 object.insert("recieved", false);
-                object.insert("sender", QString::number(SELF_ADDR,16).toUpper());
+                object.insert("sender", QString::number(_protocol->self_addr,16).toUpper());
                 object.insert("type","zigbee_identify_data");
                 _bus->push_data("zigbee_identify_data_view",object);
                 if(!is_demo)
@@ -160,7 +160,7 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
                         object.insert("text",QJsonValue(QString(zfdata.toHex(' ').toUpper())));
                         object.insert("note_text",QJsonValue("节点0x"+QString::number(node->first.addr,16).toUpper()+"正在使用旧密钥，发送密钥更新指令"));
                         object.insert("recieved", false);
-                        object.insert("sender", QString::number(SELF_ADDR,16).toUpper());
+                        object.insert("sender", QString::number(_protocol->self_addr,16).toUpper());
                         object.insert("type","zigbee_identify_data");
                         _bus->push_data("zigbee_identify_data_view",object);
                         if(!is_demo)
@@ -253,7 +253,7 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
             zigbee_protocol::ZigbeeFrame zf(0x83,0x83,node->first.addr,(char *)&bframe,bframe.length);
             QByteArray zfdata((char *)zf.data(),zf.size());
             QJsonObject object;
-            object.insert("sender", QString::number(SELF_ADDR,16).toUpper());
+            object.insert("sender", QString::number(_protocol->self_addr,16).toUpper());
             object.insert("text",QJsonValue(QString(zfdata.toHex(' ').toUpper())));
             object.insert("note_text",QJsonValue("向节点0x"+sender+"发送重置命令"));
             object.insert("recieved", false);
@@ -279,7 +279,7 @@ void ZigBeeParser::remote_addr_parser(zigbee_protocol::ZigbeeFrame &zframe, bool
 
 void ZigBeeParser::message_parser(QJsonObject message)
 {
-    if (message["type"] == "demo_verify_request" || message["type"] == "zigbee_verify_request")
+    if (message["type"] == "demo_verify_request")
     {
         hmac_frame frame;
         frame.value = QRandomGenerator::global()->bounded(256);
@@ -290,11 +290,11 @@ void ZigBeeParser::message_parser(QJsonObject message)
         new_base_frame(50 + BASE_FRAME_PREFIX_LEN) bframe;
         device test;
         test.addr = 0x5656;
-        _protocol->base_frame_maker(&frame, (base_frame *)&bframe, 0x5656, &test);
+        _protocol->base_frame_maker(&frame, (base_frame *)&bframe, _protocol->self_addr, &test);
         zigbee_protocol::ZigbeeFrame zf(0x81,0x81,0x5656,(char*)&bframe,bframe.length);
-        data_parser(zf, message["type"] == "demo_verify_request");
+        data_parser(zf, true);
     }
-    if (message["type"] == "demo_verify_key_update" || message["type"] == "zigbee_verify_key_update")
+    if (message["type"] == "demo_verify_key_update")
     {
         hmac_frame frame;
         frame.value = QRandomGenerator::global()->bounded(256);
@@ -305,9 +305,9 @@ void ZigBeeParser::message_parser(QJsonObject message)
         new_base_frame(50 + BASE_FRAME_PREFIX_LEN) bframe;
         device test;
         test.addr = 0x5656;
-        _protocol->base_frame_maker(&frame, (base_frame *)&bframe, 0x5656, &test);
+        _protocol->base_frame_maker(&frame, (base_frame *)&bframe, _protocol->self_addr, &test);
         zigbee_protocol::ZigbeeFrame zf(0x81,0x81,0x5656,(char*)&bframe,bframe.length);
-        data_parser(zf, message["type"] == "demo_verify_key_update");
+        data_parser(zf, true);
     }
     if (message["type"] == "demo_recv_data" || message["type"] == "zigbee_raw_data")
     {
@@ -316,7 +316,7 @@ void ZigBeeParser::message_parser(QJsonObject message)
         QStringList td = data.split(' ');
         for (auto item : td)
             bdata += QByteArray::fromHex(item.toLatin1());
-        zigbee_protocol::ZigbeeFrame zf(bdata[2],bdata[3],(uint16_t)bdata[4] | bdata[5]<<8, bdata.data()+6,bdata.length()-7);
+        zigbee_protocol::ZigbeeFrame zf(bdata[2],bdata[3], *(uint16_t*)(bdata.data()+4), bdata.data()+6,bdata.length()-7);
         data_parser(zf, message["type"] == "demo_recv_data");
     }
 }

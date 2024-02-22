@@ -92,8 +92,6 @@ void DLLN3X::rled_blink(uint8_t time)
 
 uint16_t DLLN3X::read_addr()
 {
-    if (_self_addr != 0)
-        return _self_addr;
     _self_addr = rw_config(CONFIG::ADDR);
     return _self_addr;
 }
