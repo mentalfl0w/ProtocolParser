@@ -52,6 +52,11 @@ void ZigBeeParser::src_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
 
 void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is_demo)
 {
+    if (zframe.size() <= 7)
+    {
+        qDebug()<<"ZigBee: recved package is corrupted, dropped.";
+        return;
+    }
     void *frame = nullptr;
     base_frame *bframe=nullptr;
     hmac_frame *hframe=nullptr;
@@ -115,7 +120,7 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
                 memset(&data, 0, sizeof(data));
                 _protocol->protocal_wrapper((data_frame *)&data, 0, 10, (u8 *)"Identified", 0);
                 node->first.verified = 1;
-                new_base_frame(15 + BASE_FRAME_PREFIX_LEN) bframe;
+                new_base_frame(15 + DATA_FRAME_PREFIX_LEN + BASE_FRAME_PREFIX_LEN) bframe;
                 memset(&bframe, 0, sizeof(bframe));
                 _protocol->base_frame_maker(&data, (base_frame *)&bframe, node->first.addr,&node->second);
                 zigbee_protocol::ZigbeeFrame zf(zframe.getSrcPort(),zframe.getDesPort(),zframe.getRemoteAddr(),(uint8_t *)&bframe,bframe.length);
@@ -150,7 +155,7 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
                         new_crypto_zdata_frame(sizeof(dframe)) zdata;
                         memset(&zdata, 0, sizeof(zdata));
                         _protocol->zigbee_data_encrypt((data_frame *)&dframe, (crypto_zdata_frame *)&zdata, Crypto::SM4_encrypt, key_str);
-                        new_base_frame(48 + BASE_FRAME_PREFIX_LEN) bframe;
+                        new_base_frame(sizeof(zdata) + BASE_FRAME_PREFIX_LEN) bframe;
                         memset(&bframe, 0, sizeof(bframe));
                         _protocol->base_frame_maker(&zdata, (base_frame *)&bframe, node->first.addr, &node->second);
                         zf.setData((u8 *)&bframe, bframe.length);
@@ -218,10 +223,11 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
         {
             zigbee_protocol::ZigbeeFrame dzf = zframe;
             new_data_frame(72) ndata;
+            memset(&ndata,0,sizeof(ndata));
             if (*(u16 *)frame == CRYPTO_ZDATA_FRAME_HEAD)
             {
                 czdata = (crypto_zdata_frame*)frame;
-                _protocol->zigbee_data_dectypt((data_frame*)&ndata, czdata, Crypto::SM4_encrypt);
+                _protocol->zigbee_data_dectypt((data_frame*)&ndata, czdata, Crypto::SM4_decrypt);
                 dzf.setData((char*)&ndata,ndata.data_length + DATA_FRAME_PREFIX_LEN);
                 zdata = QByteArray((char *)dzf.data(), dzf.size());
                 object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
@@ -244,10 +250,10 @@ void ZigBeeParser::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is
             object.insert("type","zigbee_recv_data");
             _bus->push_data("zigbee_recv_data_view",object);
             node->second.id=0;
-            new_data_frame(50) dframe;
+            new_data_frame(5) dframe;
             memset(&dframe,0,sizeof (dframe));
             _protocol->protocal_wrapper((data_frame *)&dframe, 0, 5, (u8 *)"RESET", false);
-            new_base_frame(50 + BASE_FRAME_PREFIX_LEN) bframe;
+            new_base_frame(5 + DATA_FRAME_PREFIX_LEN + BASE_FRAME_PREFIX_LEN) bframe;
             memset(&bframe, 0, sizeof(bframe));
             _protocol->base_frame_maker(&dframe, (base_frame *)&bframe, node->first.addr,&node->second);
             zigbee_protocol::ZigbeeFrame zf(0x83,0x83,node->first.addr,(char *)&bframe,bframe.length);
@@ -316,7 +322,8 @@ void ZigBeeParser::message_parser(QJsonObject message)
         QStringList td = data.split(' ');
         for (auto item : td)
             bdata += QByteArray::fromHex(item.toLatin1());
-        zigbee_protocol::ZigbeeFrame zf(bdata[2],bdata[3], *(uint16_t*)(bdata.data()+4), bdata.data()+6,bdata.length()-7);
+        zigbee_protocol::ZigbeeFrame zf;
+        zf.load_package((uint8_t*)bdata.data(),bdata.length());
         data_parser(zf, message["type"] == "demo_recv_data");
     }
 }

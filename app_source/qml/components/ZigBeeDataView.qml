@@ -124,42 +124,6 @@ Item{
             Component.onCompleted: {
                 EventsBus.reg_event(data_view_event)
             }
-
-            // Component.onCompleted: {
-            //     for(let i = 0; i<20;i++)
-            //     {
-            //         function generate_value(){
-            //             let repeat_count = Math.floor(Math.random()*40) + 6
-            //             let t = `FF ${repeat_count.toString(16).toUpperCase()} ${Math.floor(Math.random()*16).toString(16).toUpperCase()}${Math.floor(Math.random()*16).toString(16).toUpperCase()} ${Math.floor(Math.random()*16).toString(16).toUpperCase()}${Math.floor(Math.random()*16).toString(16).toUpperCase()} ${Math.floor(Math.random()*16).toString(16).toUpperCase()}${Math.floor(Math.random()*16).toString(16).toUpperCase()} ${Math.floor(Math.random()*16).toString(16).toUpperCase()}${Math.floor(Math.random()*16).toString(16).toUpperCase()}`
-            //             for (let j=0;j<repeat_count;j++){
-            //                 t+=` ${Math.floor(Math.random()*16).toString(16).toUpperCase()}${Math.floor(Math.random()*16).toString(16).toUpperCase()}`
-            //             }
-            //             t+=" FE"
-            //             return t
-            //         }
-            //         if (Math.floor(Math.random()*2) === 0)
-            //         {
-            //             let v = generate_value()
-            //             let sender = v.split(" ").slice(4, 6).join("")
-            //             message_model.append({
-            //                                      text: v,
-            //                                      recieved: true,
-            //                                      sender: sender
-            //                                  })
-            //         }
-            //         else
-            //         {
-            //             let v = generate_value()
-            //             let sender = v.split(" ").slice(4, 6).join("")
-            //             message_model.append({
-            //                                      text: v,
-            //                                      decrypted_text: v,
-            //                                      recieved: true,
-            //                                      sender: sender
-            //                                  })
-            //         }
-            //     }
-            // }
         }
         RibbonRectangle{
             id: data_title_bar

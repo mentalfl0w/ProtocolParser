@@ -193,7 +193,8 @@ bool SerialPortManager::write(QString data)
         for (auto item : td)
             bdata += QByteArray::fromHex(item.toLatin1());
 
-        zigbee_protocol::ZigbeeFrame zf(bdata[2],bdata[3],*(uint16_t*)(bdata.data()+4), bdata.data()+6,bdata.length()-7);
+        zigbee_protocol::ZigbeeFrame zf;
+        zf.load_package((uint8_t*)bdata.data(),bdata.length());
 
         return _zigbee->send(zf);
     }

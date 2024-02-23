@@ -374,7 +374,7 @@ RibbonTabBar {
 
                     let repeat_count = 16
                     let t = `FF 29 ${get_rand_byte()}${get_rand_byte()} 83 23 32 `+
-                        `AA AD 23 32 52 48 23 32 01 00 17 00 00 00 AA AA 01 00 10 00 00 `
+                        `AA AD 23 32 52 48 23 32 01 00 17 00 00 00 AA AA 01 10 00 FF FF `
                     for (let j=0;j<repeat_count;j++){
                         t+=` ${get_rand_byte()}${get_rand_byte()}`
                     }
