@@ -61,9 +61,10 @@ ZigbeeFrame DLLN3X::recv(bool non_blocked)
 bool DLLN3X::send(ZigbeeFrame zf)
 {
     bool status = false;
-    if (zf.getSrcPort() < 0x80)
+    uint8_t len = zf.size();
+    if (zf.getSrcPort() < 0x80 || (len + 4) > 63)
         return false;
-    status = _DSerial->write((char *)zf.data(),zf.size());
+    status = _DSerial->write((char *)zf.data(),len);
     status = _DSerial->flush();
     return status;
 }
@@ -71,7 +72,7 @@ bool DLLN3X::send(ZigbeeFrame zf)
 bool DLLN3X::send_cmd(uint8_t des_port, uint8_t arg, uint8_t* data, uint8_t data_length)
 {
     ZigbeeFrame zf(0x80, des_port, 0x0000);
-    if (data_length - 4 > 63 - 1)
+    if (data_length + 4 > 63)
         return false;
     zf.append(arg);
     zf.addData(data, data_length);

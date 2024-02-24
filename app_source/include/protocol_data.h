@@ -183,13 +183,13 @@ typedef struct login_resp
 }login_resp;
 
 #define SENSOR_DATA_TYPE 1
-#define SENSOR_DATA_LENGTN sizeof(double)*4
+#define SENSOR_DATA_LENGTN sizeof(float)*4
 typedef struct sensor_data
 {
-    double ppm;
-    double temp;
-    double humi;
-    double flare;
+    float ppm;
+    float temp;
+    float humi;
+    float flare;
 }sensor_data;
 
 #define THRESHOLD_DATA_TYPE 2

@@ -163,16 +163,19 @@ void Crypto::SM3_HMAC(u8 *key, int keylen, u8 *input, int ilen, u8 *output)
     sm3_hmac(key, keylen, input, ilen, output);
 }
 
-bool Crypto::SM4_encrypt(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len)
+bool Crypto::SM4_encrypt(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc)
 {
     struct sm4_ctx a;
     u32 max_len;
     u8 key[17] = { 0 }, *in = (u8 *)malloc(sizeof(u8) * (in_len + 16 * 2 + 1)); // 为保证C兼容性，不使用智能指针 两个16分别是为首末尾填充留足留足空间，1是冗余量
     u8 iv[17] = {
                  0x21, 0xBC, 0xC1, 0xEA, 0x0D, 0xB8, 0x54, 0x6D, 0xCE, 0xE4, 0xDB, 0x3C, 0xFA, 0xC1, 0x3C, 0xEF }, fix_len; // 此处为省时才用固定IV，实际上此处IV必须是随机的才可真正保证SM4 CBC模式下加解密的强度
-    for (int i = 0; i < 16; i++)
+    if (use_real_cbc)
     {
-        iv[i] = Crypto::getInstance()->get_rand(); // 使用随机数IV，如果想节省时间可以注释
+        for (int i = 0; i < 16; i++)
+        {
+            iv[i] = Crypto::getInstance()->get_rand(); // 使用随机数IV，如果想节省时间可以注释
+        }
     }
     if (key_len > 16) {
         free(in);
@@ -180,28 +183,31 @@ bool Crypto::SM4_encrypt(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len,
     }
     fix_len = 16 - key_len;
     memcpy(key, key_origin, key_len);
-    for (int i = 0; i < 16; i++)
+    if (use_real_cbc)
     {
-        in[i] = Crypto::getInstance()->get_rand(); // 首填充
+        for (int i = 0; i < 16; i++)
+        {
+            in[i] = Crypto::getInstance()->get_rand(); // 首填充
+        }
     }
-    memcpy(in + 16, in_origin, in_len);
+    memcpy(in + (use_real_cbc ? 16 : 0), in_origin, in_len);
     if (key_len < 16) {
         for (int i = key_len; i < 16; i++) {
             key[i] = fix_len;
         }
     }
     if (in_len % 16 != 0) {
-        max_len = ceil(in_len / 16.0)* 16 + 16;
-        fix_len = max_len - 16 - in_len;
-        for (u32 i = in_len + 16; i < max_len; i++) {
+        max_len = ceil(in_len / 16.0)* 16 + (use_real_cbc ? 16 : 0);
+        fix_len = max_len - (use_real_cbc ? 16 : 0) - in_len;
+        for (u32 i = in_len + (use_real_cbc ? 16 : 0); i < max_len; i++) {
             in[i] = fix_len;
         }
         in_len = max_len;
     } else {
-        for (u32 i = in_len + 16; i < in_len + 16 * 2; i++) {
+        for (u32 i = in_len + (use_real_cbc ? 16 : 0); i < in_len + 16 + (use_real_cbc ? 16 : 0); i++) {
             in[i] = 16;
         }
-        in_len += 16 * 2;
+        in_len += 16 + (use_real_cbc ? 16 : 0);
     }
     *out_len = in_len;
     sm4_cbc_encrypt(&a, key, iv, in, in_len, out);
@@ -209,7 +215,7 @@ bool Crypto::SM4_encrypt(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len,
     return true;
 }
 
-bool Crypto::SM4_decrypt(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len)
+bool Crypto::SM4_decrypt(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc)
 {
     struct sm4_ctx b;
     u32 fix_len;
@@ -217,9 +223,12 @@ bool Crypto::SM4_decrypt(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *ou
     u8 iv[17] = {
                  0x21, 0xBC, 0xC1, 0xEA, 0x0D, 0xB8, 0x54, 0x6D, 0xCE, 0xE4, 0xDB, 0x3C, 0xFA, 0xC1, 0x3C, 0xEF }; // 此处为省时才用固定IV，实际上此处IV必须是随机的才可真正保证SM4 CBC模式下加解密的强度
     u8* out_buf = (u8* )malloc(in_len * sizeof(u8)); // 为保证C兼容性，不使用智能指针
-    for (int i = 0; i < 16; i++)
+    if (use_real_cbc)
     {
-        iv[i] = Crypto::getInstance()->get_rand(); // 使用随机数IV，如果想节省时间可以注释
+        for (int i = 0; i < 16; i++)
+        {
+            iv[i] = Crypto::getInstance()->get_rand(); // 使用随机数IV，如果想节省时间可以注释
+        }
     }
     if (key_len > 16) {
         free(out_buf);
@@ -243,8 +252,8 @@ bool Crypto::SM4_decrypt(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *ou
         free(out_buf);
         return false;
     }
-    *out_len = in_len - fix_len - 16;
-    memcpy(out, out_buf + 16, *out_len);
+    *out_len = in_len - fix_len - (use_real_cbc ? 16 : 0);
+    memcpy(out, out_buf + (use_real_cbc ? 16 : 0), *out_len);
     free(out_buf);
     return true;
 }

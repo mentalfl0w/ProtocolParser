@@ -24,8 +24,8 @@ public:
     static void SM2_sign(u8 *pri, u8 *data, u32 datalen, u8 *out);
     static bool SM2_verify(u8 *pub, u8 *data, u32 data_len, u8 *sig);
     static void SM3_HMAC(u8 *key, int keylen,u8 *input, int ilen,u8 output[32] );
-    static bool SM4_encrypt(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len);
-    static bool SM4_decrypt(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len);
+    static bool SM4_encrypt(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc = true);
+    static bool SM4_decrypt(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc = true);
     static uint8_t get_rand();
 private:
     Crypto();

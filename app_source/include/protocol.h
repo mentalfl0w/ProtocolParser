@@ -22,12 +22,12 @@ public:
                        void (*sendToserver)(ZigbeeFrame &data),
                        void (*SM3_HMAC)(u8 *key, int keylen,u8 *input, int ilen,u8 output[32] ));
     void HMAC_changeVerifykey(u8 key[16], device* self, device *node, void (*sendTonode)(ZigbeeFrame &data),
-                                                   bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len));
-    void zigbee_data_encrypt(data_frame *data, crypto_zdata_frame *zdata,
-                        bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len),
+                                                   bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc));
+    void zigbee_data_encrypt(uint8_t *data, uint8_t data_len, crypto_zdata_frame *zdata,
+                        bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc),
                         QString en_key = "");
-    bool zigbee_data_dectypt(data_frame *data, crypto_zdata_frame *zdata,
-                             bool (* SM4_decrypt)(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len),
+    bool zigbee_data_dectypt(uint8_t *data, uint8_t *data_len, crypto_zdata_frame *zdata,
+                             bool (* SM4_decrypt)(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc),
                         QString en_key = "");
     QString hmac_verify_key = "11223344556677888877665544332211";
     QStringList pre_hmac_verify_key;

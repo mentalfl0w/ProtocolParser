@@ -159,19 +159,19 @@ bool Protocol::data_frame_verify(data_frame *frame)
         return true;
 }
 
-void Protocol::zigbee_data_encrypt(data_frame *data, crypto_zdata_frame *zdata,
-                                     bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len),
+void Protocol::zigbee_data_encrypt(uint8_t *data, uint8_t data_len, crypto_zdata_frame *zdata,
+                                     bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc),
                                    QString en_key)
 {
     u32 len;
     zdata->head=CRYPTO_ZDATA_FRAME_HEAD;
     QByteArray key = QByteArray::fromHex(en_key == "" ? hmac_verify_key.toLatin1() : en_key.toLatin1());
-    SM4_encrypt((u8 *)key.data(), 16, (u8 *)data, data->data_length + DATA_FRAME_PREFIX_LEN, zdata->data,&len);
+    SM4_encrypt((u8 *)key.data(), 16, data, data_len, zdata->data,&len,false);
     zdata->length = len + CRYPTO_ZDATA_FRAME_PREFIX_LEN;
 }
 
-bool Protocol::zigbee_data_dectypt(data_frame *data, crypto_zdata_frame *zdata,
-                                       bool (* SM4_decrypt)(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len),
+bool Protocol::zigbee_data_dectypt(uint8_t *data, uint8_t *data_len, crypto_zdata_frame *zdata,
+                                       bool (* SM4_decrypt)(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc),
                                    QString en_key)
 {
     int total_len = zdata->length;
@@ -179,7 +179,8 @@ bool Protocol::zigbee_data_dectypt(data_frame *data, crypto_zdata_frame *zdata,
         return false;
     u32 len, msglen = total_len - CRYPTO_ZDATA_FRAME_PREFIX_LEN;
     QByteArray key = QByteArray::fromHex(en_key == "" ? hmac_verify_key.toLatin1() : en_key.toLatin1());
-    SM4_decrypt((u8 *)key.data(), 16, zdata->data, msglen, (u8 *)data, &len);
+    SM4_decrypt((u8 *)key.data(), 16, zdata->data, msglen, data, &len,false);
+    *data_len = len;
     return true;
 }
 
@@ -209,15 +210,12 @@ void Protocol::HMAC_identify(device *self, device *node, hmac_frame *hframe,
 }
 
 void Protocol::HMAC_changeVerifykey(u8 key[16], device* self, device *node, void (*sendTonode)(ZigbeeFrame &data),
-                                    bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len))
+                                    bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc))
 {
     ZigbeeFrame zf(0x82,0x82,node->addr);
-    new_data_frame(16) data;
-    memset(&data, 0, sizeof(data));
-    protocal_wrapper((data_frame *)&data, 0, 16, key, 0);
     new_crypto_zdata_frame(48) zdata;
     memset(&zdata, 0, sizeof(zdata));
-    zigbee_data_encrypt((data_frame *)&data, (crypto_zdata_frame *)&zdata, SM4_encrypt);
+    zigbee_data_encrypt(key, 16, (crypto_zdata_frame *)&zdata, SM4_encrypt);
     new_base_frame(48 + BASE_FRAME_PREFIX_LEN) bframe;
     memset(&bframe, 0, sizeof(bframe));
     base_frame_maker(&zdata, (base_frame *)&bframe, node->addr, self);
