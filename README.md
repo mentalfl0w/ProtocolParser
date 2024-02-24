@@ -1,6 +1,20 @@
 # ProtocolParser
-协议解析器
-# 通讯协议解析
+<div align="center">
+    <img src="app_source/resources/imgs/icon.png" alt="Logo" style="width:40%; height:auto;">
+</div>
+<h1 align="center"> ProtocolParser 协议解析器 V1.0.1</h1>
+
+## 一、介绍
+这是一个用于与DKY的THM3682实验箱搭配使用的上位机协议解析器，具体协议如「通讯协议解析」所示，后续功能使用说明待补充。
+<div align="center">
+    <div align="center">
+        <img src="documents/pictures/home-light.png" alt="主界面（浅色）" style="width:45%; height:auto;">
+        <img src="documents/pictures/home-dark.png" alt="主界面（深色）" style="width:45%; height:auto;">
+    </div>
+    <p align="center"> 主界面（浅色/深色模式） </p>
+</div>
+
+## 二、通讯协议解析
 
 - [通讯协议解析](#通讯协议解析)
   - [1. 概述](#1-概述)
@@ -22,12 +36,12 @@
       - [5.1.2 void base\_frame\_maker(void \*in\_frame, base\_frame \*out\_frame, u16 dest\_addr,device \*dev,u16 node\_addr=0)](#512-void-base_frame_makervoid-in_frame-base_frame-out_frame-u16-dest_addrdevice-devu16-node_addr0)
       - [5.1.3 bool base\_frame\_parser(base\_frame \*in\_frame, void \*\*out\_frame, device \*dev)](#513-bool-base_frame_parserbase_frame-in_frame-void-out_frame-device-dev)
       - [5.1.4 void ssl\_frame\_maker(ssl\_frame \*frame, u8 \*data, int data\_len)](#514-void-ssl_frame_makerssl_frame-frame-u8-data-int-data_len)
-      - [5.1.5 void zigbee\_data\_encrypt(data\_frame \*data, crypto\_zdata\_frame *zdata, bool (* SM4\_encrypt)(u8 \*key\_origin, u32 key\_len, u8 \*in\_origin, u32 in\_len, u8 \*out, u32 \*out\_len),QString en\_key = "")](#515-void-zigbee_data_encryptdata_frame-data-crypto_zdata_frame-zdata-bool--sm4_encryptu8-key_origin-u32-key_len-u8-in_origin-u32-in_len-u8-out-u32-out_lenqstring-en_key--)
-      - [5.1.6 bool zigbee\_data\_dectypt(data\_frame \*data, crypto\_zdata\_frame *zdata,bool (* SM4\_decrypt)(u8 \*key\_origin, u32 key\_len, u8 \*in, u32 in\_len, u8 \*out, u32 \*out\_len),QString en\_key = "")](#516-bool-zigbee_data_dectyptdata_frame-data-crypto_zdata_frame-zdatabool--sm4_decryptu8-key_origin-u32-key_len-u8-in-u32-in_len-u8-out-u32-out_lenqstring-en_key--)
+      - [5.1.5 void zigbee\_data\_encrypt(data\_frame \*data, crypto\_zdata\_frame *zdata, bool (* SM4\_encrypt)(u8 \*key\_origin, u32 key\_len, u8 \*in\_origin, u32 in\_len, u8 \*out, u32 \*out\_len, bool use\_real\_cbc),QString en\_key = "")](#515-void-zigbee_data_encryptdata_frame-data-crypto_zdata_frame-zdata-bool--sm4_encryptu8-key_origin-u32-key_len-u8-in_origin-u32-in_len-u8-out-u32-out_len-bool-use_real_cbcqstring-en_key--)
+      - [5.1.6 bool zigbee\_data\_dectypt(data\_frame \*data, crypto\_zdata\_frame *zdata,bool (* SM4\_decrypt)(u8 \*key\_origin, u32 key\_len, u8 \*in, u32 in\_len, u8 \*out, u32 \*out\_len, bool use\_real\_cbc),QString en\_key = "")](#516-bool-zigbee_data_dectyptdata_frame-data-crypto_zdata_frame-zdatabool--sm4_decryptu8-key_origin-u32-key_len-u8-in-u32-in_len-u8-out-u32-out_len-bool-use_real_cbcqstring-en_key--)
     - [5.2 协议认证/验证](#52-协议认证验证)
-      - [5.2.1 void HMAC\_identify(device \*self, device \*node, hmac\_frame \*hframe, void (\*sendTonode)(ZigbeeFrame \&data), void (\*SM3\_HMAC)(u8 \*key, int keylen,u8 \*input, int ilen,u8 output\[32\] ))](#521-void-hmac_identifydevice-self-device-node-hmac_frame-hframe-void-sendtonodezigbeeframe-data-void-sm3_hmacu8-key-int-keylenu8-input-int-ilenu8-output32-)
+      - [5.2.1 void HMAC\_identify(device \*self, device \*node, hmac\_frame \*hframe, void (\*sendTonode)(ZigbeeFrame \&data), void (\*SM3\_HMAC)(u8 \*key, int keylen,u8 \*input, int ilen,u8 output\[32\]))](#521-void-hmac_identifydevice-self-device-node-hmac_frame-hframe-void-sendtonodezigbeeframe-data-void-sm3_hmacu8-key-int-keylenu8-input-int-ilenu8-output32)
       - [5.2.2 bool data\_frame\_verify(data\_frame \*frame)](#522-bool-data_frame_verifydata_frame-frame)
-      - [5.2.3 void HMAC\_changeVerifykey(u8 key\[16\], device\* self, device \*node, void (*sendTonode)(ZigbeeFrame \&data),bool (* SM4\_encrypt)(u8 \*key\_origin, u32 key\_len, u8 \*in\_origin, u32 in\_len, u8 \*out, u32 \*out\_len))](#523-void-hmac_changeverifykeyu8-key16-device-self-device-node-void-sendtonodezigbeeframe-databool--sm4_encryptu8-key_origin-u32-key_len-u8-in_origin-u32-in_len-u8-out-u32-out_len)
+      - [5.2.3 void HMAC\_changeVerifykey(u8 key\[16\], device\* self, device \*node, void (*sendTonode)(ZigbeeFrame \&data),bool (* SM4\_encrypt)(u8 \*key\_origin, u32 key\_len, u8 \*in\_origin, u32 in\_len, u8 \*out, u32 \*out\_len, bool use\_real\_cbc))](#523-void-hmac_changeverifykeyu8-key16-device-self-device-node-void-sendtonodezigbeeframe-databool--sm4_encryptu8-key_origin-u32-key_len-u8-in_origin-u32-in_len-u8-out-u32-out_len-bool-use_real_cbc)
     - [5.3 工具](#53-工具)
       - [5.3.1 uint16\_t crc16\_xmodem(const uint8\_t \*buffer, uint32\_t buffer\_length)](#531-uint16_t-crc16_xmodemconst-uint8_t-buffer-uint32_t-buffer_length)
       - [5.3.2 bool bytecmp(u8 \*a, u8 \*b, u16 length)](#532-bool-bytecmpu8-a-u8-b-u16-length)
@@ -214,7 +228,7 @@ sequenceDiagram
 | in_frame | 输出 | 非对称双向认证包指针，指向需要被打包进非对称双向认证包的数据地址 |
 | data | 输入 | 数据指针 |
 | data_len | 输入 | 数据长度 |
-#### 5.1.5 void zigbee_data_encrypt(data_frame *data, crypto_zdata_frame *zdata, bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len),QString en_key = "")
+#### 5.1.5 void zigbee_data_encrypt(data_frame *data, crypto_zdata_frame *zdata, bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc),QString en_key = "")
 对数据进行对称加密。
 | 变量名 | 输入/输出 | 说明 |
 |:----:|:----:|:----:|
@@ -222,7 +236,7 @@ sequenceDiagram
 | zdata | 输出 | 待填充的对称加密数据包指针 |
 | SM4_encrypt | 输入 | SM4加密算法函数指针 |
 | en_key | 输入 | 若不提供密钥，则将使用默认密钥进行加密 |
-#### 5.1.6 bool zigbee_data_dectypt(data_frame *data, crypto_zdata_frame *zdata,bool (* SM4_decrypt)(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len),QString en_key = "")
+#### 5.1.6 bool zigbee_data_dectypt(data_frame *data, crypto_zdata_frame *zdata,bool (* SM4_decrypt)(u8 *key_origin, u32 key_len, u8 *in, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc),QString en_key = "")
 对数据进行对称解密，返回`true`代表解密成功，`false`代表解密失败，需要检查输入是否错误。
 | 变量名 | 输入/输出 | 说明 |
 |:----:|:----:|:----:|
@@ -231,7 +245,7 @@ sequenceDiagram
 | SM4_decrypt | 输入 | SM4解密算法函数指针 |
 | en_key | 输入 | 若不提供密钥，则将使用默认密钥进行解密 |
 ### 5.2 协议认证/验证
-#### 5.2.1 void HMAC_identify(device *self, device *node, hmac_frame *hframe, void (*sendTonode)(ZigbeeFrame &data), void (*SM3_HMAC)(u8 *key, int keylen,u8 *input, int ilen,u8 output[32] ))
+#### 5.2.1 void HMAC_identify(device *self, device *node, hmac_frame *hframe, void (*sendTonode)(ZigbeeFrame &data), void (*SM3_HMAC)(u8 *key, int keylen,u8 *input, int ilen,u8 output[32]))
 对接收到的HMAC包进行数据认证。
 | 变量名 | 输入/输出 | 说明 |
 |:----:|:----:|:----:|
@@ -244,7 +258,7 @@ sequenceDiagram
 | 变量名 | 输入/输出 | 说明 |
 |:----:|:----:|:----:|
 | frame | 输入 | 待检验的数据帧指针 |
-#### 5.2.3 void HMAC_changeVerifykey(u8 key[16], device* self, device *node, void (*sendTonode)(ZigbeeFrame &data),bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len))
+#### 5.2.3 void HMAC_changeVerifykey(u8 key[16], device* self, device *node, void (*sendTonode)(ZigbeeFrame &data),bool (* SM4_encrypt)(u8 *key_origin, u32 key_len, u8 *in_origin, u32 in_len, u8 *out, u32 *out_len, bool use_real_cbc))
 发送对称双向认证密钥更换指令包。
 | 变量名 | 输入/输出 | 说明 |
 |:----:|:----:|:----:|
