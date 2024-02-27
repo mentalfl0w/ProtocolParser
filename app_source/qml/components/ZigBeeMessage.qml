@@ -5,7 +5,7 @@ import RibbonUI
 
 RibbonMessage{
     id: message_style
-    sender_text: data_model.recieved ? `${Qt.formatDateTime(new Date(), "yyyy-MM-dd hh:mm:ss ")} Node 0x${data_model.sender}` : `${Qt.formatDateTime(new Date(), "yyyy-MM-dd hh:mm:ss ")} Computer 0x${data_model.sender}`
+    sender_text: data_model.recieved ? `${data_model.time} Node 0x${data_model.sender}` : `${data_model.time} Computer 0x${data_model.sender}`
     property var text_list: data_model.text ? data_model.text.split(' ') : []
     property var decrypted_text_list: data_model.decrypted_text ? data_model.decrypted_text.split(' ') : []
     property bool show_tooltip: true

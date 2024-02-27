@@ -62,7 +62,7 @@ bool DLLN3X::send(ZigbeeFrame zf)
 {
     bool status = false;
     uint8_t len = zf.size();
-    if (zf.getSrcPort() < 0x80 || (len + 4) > 63)
+    if (zf.getSrcPort() < 0x80 || len > 66)
         return false;
     status = _DSerial->write((char *)zf.data(),len);
     status = _DSerial->flush();

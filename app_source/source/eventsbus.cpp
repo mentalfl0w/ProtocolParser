@@ -35,7 +35,7 @@ void EventsBus::push_data(QString type, QJsonObject data)
     if (_event_history.count() >= 100)
         _event_history.pop_front();
     if (data["time"].toString()=="")
-        data.insert("time",QJsonValue(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")));
+        data.insert("time",QJsonValue(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")));
     _event_history.append(data);
     for (auto event : _events) {
         if (event->type() == type)

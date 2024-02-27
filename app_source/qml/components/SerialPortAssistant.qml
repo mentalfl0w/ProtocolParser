@@ -22,7 +22,7 @@ Item{
         top_padding: serial_title_bar.height + control.top_padding + (!RibbonTheme.modern_style ? 10 : 0)
         bottom_padding: message_sender.height + control.bottom_padding
         delegate: ZigBeeMessage{
-            sender_text: `${Qt.formatDateTime(new Date(), "yyyy-MM-dd hh:mm:ss.zzz")} ${model.recieved ? '收' : '发'}`
+            sender_text: `${model.time} ${model.recieved ? '收' : '发'}`
             show_tooltip: control.show_tooltip
             component_width: serial_view.width / 2
         }
