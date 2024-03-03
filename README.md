@@ -2,7 +2,7 @@
 <div align="center">
     <img src="app_source/resources/imgs/icon.png" alt="Logo" style="width:40%; height:auto;">
 </div>
-<h1 align="center"> ProtocolParser 协议解析器 V1.0.1</h1>
+<h1 align="center"> ProtocolParser 协议解析器 V1.0.2</h1>
 
 ## 一、介绍
 这是一个用于与DKY的THM3682实验箱搭配使用的上位机协议解析器，具体协议如「通讯协议解析」所示，后续功能使用说明待补充。
