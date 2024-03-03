@@ -35,6 +35,7 @@ public:
 private:
     Protocol();
     ~Protocol();
+    Q_DISABLE_COPY_MOVE(Protocol)
     Config* _config = nullptr;
 };
 }

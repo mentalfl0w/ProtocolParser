@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(ProtocolParser VERSION 1.0.1 LANGUAGES CXX)
+project(ProtocolParser VERSION ${CMAKE_PROJECT_VERSION} LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,8 +13,8 @@ set(PROJECT_COMPANY "Mentalflow's Lab")
 set(PROJECT_COPYRIGHT "Copyright (c) 2023 Mentalflow's Lab. All rights reserved.")
 set(PROJECT_DOMAIN "dev.ourdocs.cn.protocolparser")
 set(PROJECT_BUNDLE_NAME ${PROJECT_NAME})
-
-add_definitions(-DPROTOCOLPARSER_VERSION=1,0,1)
+set(version_str "${CMAKE_PROJECT_VERSION_MAJOR},${CMAKE_PROJECT_VERSION_MINOR},${CMAKE_PROJECT_VERSION_PATCH}")
+add_definitions(-DPROTOCOLPARSER_VERSION=${version_str})
 
 find_package(Qt6 COMPONENTS Quick SerialPort LinguistTools REQUIRED)
 
@@ -24,8 +24,18 @@ set(
     include/zigbeeparser.h source/zigbeeparser.cpp source/crypto.cpp include/crypto.h
     include/protocol.h source/protocol.cpp include/protocol_data.h
     include/config.h source/config.cpp
+    include/serialdataresolver.h source/serialdataresolver.cpp
+    include/zigbeedataresolver.h source/zigbeedataresolver.cpp
     languages/zh_CN.ts languages/en_US.ts
-#    dlln3x_handler.h dlln3x_handler.cpp
+)
+
+set(
+    qml_files qml/Main.qml qml/components/RibbonWindow.qml qml/components/ZigBeeFrame.qml
+    qml/components/RibbonMessageListView.qml qml/components/RibbonMessage.qml
+    qml/components/ZigBeeMessage.qml qml/components/SerialPortAssistant.qml
+    qml/components/ZigBeeDataView.qml qml/components/TabBar.qml qml/components/CenterView.qml
+    qml/components/ListTable.qml qml/components/DeviceList.qml qml/components/KeysList.qml
+    qml/components/EventsHistoryList.qml
 )
 
 INCLUDE_DIRECTORIES(dlln3x include)
@@ -43,19 +53,19 @@ if (WIN32)
         ${sources_files}
         resources/icon.rc
     )
-    file(TO_CMAKE_PATH "/" PATH_SEPARATOR)
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-        set(DLLPATH ../3rdparty/msvc/*.dll)
-    else()
-        set(DLLPATH ../3rdparty/mingw/*.dll)
-    endif()
-    string(REPLACE "/" ${PATH_SEPARATOR} DLLPATH "${DLLPATH}")
-    file(GLOB DLL_FILES ${DLLPATH})
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${DLL_FILES}
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    )
+file(TO_CMAKE_PATH "/" PATH_SEPARATOR)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(DLLPATH ../3rdparty/msvc/*.dll)
+else()
+    set(DLLPATH ../3rdparty/mingw/*.dll)
+endif()
+string(REPLACE "/" ${PATH_SEPARATOR} DLLPATH "${DLLPATH}")
+file(GLOB DLL_FILES ${DLLPATH})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${DLL_FILES}
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+)
 elseif(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE AppIcon)
     set(App_ICON "resources/imgs/AppIcon.icns")
@@ -71,15 +81,16 @@ else ()
     )
 endif ()
 
+foreach(qmlfile ${qml_files})
+    string(REPLACE "qml/" "" fixedfile ${qmlfile})
+    set_source_files_properties(${qmlfile} PROPERTIES QT_RESOURCE_ALIAS ${fixedfile})
+endforeach(qmlfile)
+
 qt_add_qml_module(${PROJECT_NAME}
     URI ${PROJECT_NAME}
-    VERSION 1.0
-    QML_FILES qml/Main.qml qml/components/RibbonWindow.qml qml/components/ZigBeeFrame.qml
-            qml/components/RibbonMessageListView.qml qml/components/RibbonMessage.qml
-            qml/components/ZigBeeMessage.qml qml/components/SerialPortAssistant.qml
-            qml/components/ZigBeeDataView.qml qml/components/TabBar.qml qml/components/CenterView.qml
-            qml/components/ListTable.qml qml/components/DeviceList.qml qml/components/KeysList.qml
-            qml/components/EventsHistoryList.qml
+    QML_FILES ${qml_files}
+    RESOURCE_PREFIX "/qt/qml/"
+    VERSION ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -94,9 +105,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 qt_add_translations(${PROJECT_NAME}
-                    TS_FILES languages/zh_CN.ts languages/en_US.ts
-                    RESOURCE_PREFIX "/translations"
-                    )
+    TS_FILES languages/zh_CN.ts languages/en_US.ts
+    RESOURCE_PREFIX "/translations"
+)
 
 if(RIBBONUI_BUILD_STATIC_LIB)
     add_definitions(-DRIBBONUI_BUILD_STATIC_LIB)

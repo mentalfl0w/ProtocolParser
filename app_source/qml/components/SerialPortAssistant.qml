@@ -32,16 +32,13 @@ Item{
         }
         Connections{
             target: SerialPortManager
-            function onReadyReadChanged(){
-                if (control.handle_serial && SerialPortManager.readyRead)
-                {
-                    var d = SerialPortManager.read()
-                    serial_view.message_model.append({
-                                             note_text: d.toString(),
-                                             recieved: true,
-                                         })
-                }
-
+            function onRecved(data)
+            {
+                serial_view.message_model.append({
+                                                     time: Qt.formatDateTime(new Date(), "yyyy-MM-dd hh:mm:ss.zzz"),
+                                                     note_text: data.toString(),
+                                                     recieved: true,
+                                                 })
             }
         }
     }
@@ -188,13 +185,14 @@ Item{
                     SerialPortManager.send_hex = tab_bar.send_hex
                     SerialPortManager.send_type = serial_send_type_combo.currentText === "无" ? SerialPortManager.Blank
                                                                                              : serial_send_type_combo.currentText === "回车" ? SerialPortManager.WithCarriageEnter
-                                                                                             : serial_send_type_combo.currentText === "换行" ? SerialPortManager.WithLineFeed
-                                                                                             : SerialPortManager.WithCarriageEnterAndLineFeed
+                                                                                                                                           : serial_send_type_combo.currentText === "换行" ? SerialPortManager.WithLineFeed
+                                                                                                                                                                                         : SerialPortManager.WithCarriageEnterAndLineFeed
                     SerialPortManager.write(message_sender_textbox.text)
                     serial_view.message_model.append({
-                                             note_text: message_sender_textbox.text,
-                                             recieved: false,
-                                         })
+                                                         time: Qt.formatDateTime(new Date(), "yyyy-MM-dd hh:mm:ss.zzz"),
+                                                         note_text: message_sender_textbox.text,
+                                                         recieved: false,
+                                                     })
                     message_sender_textbox.textedit.clear()
                 }
 

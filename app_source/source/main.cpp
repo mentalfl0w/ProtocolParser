@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 #ifdef RIBBONUI_BUILD_STATIC_LIB
     engine.addImportPath("qrc:/");
 #endif
-    const QUrl url(u"qrc:/ProtocolParser/qml/Main.qml"_qs);
+    const QUrl url(u"qrc:/qt/qml/ProtocolParser/Main.qml"_qs);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
         &app, [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)

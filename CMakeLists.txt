@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(ProtocolParser_APP VERSION 0.1 LANGUAGES CXX)
+project(ProtocolParser_APP VERSION 1.0.2 LANGUAGES CXX)
 
 add_definitions(-DFRAMELESSHELPER_CORE_NO_DEBUG_OUTPUT)
 add_definitions(-DFRAMELESSHELPER_QUICK_NO_DEBUG_OUTPUT)

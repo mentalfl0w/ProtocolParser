@@ -37,7 +37,7 @@ RibbonTabBar {
                             }
                             icon_source: RibbonIcons.SerialPort
                             currentIndex: 0
-                            enabled: SerialPortManager.closed
+                            enabled: !SerialPortManager.opened
                             Connections{
                                 target: SerialPortManager
                                 function onAvailable_portsChanged(ports){
@@ -70,7 +70,7 @@ RibbonTabBar {
                                     ListElement { text: "57600" }
                                     ListElement { text: "115200" }
                                 }
-                                enabled: SerialPortManager.closed
+                                enabled: !SerialPortManager.opened
                                 currentIndex: 6
                                 icon_source: RibbonIcons.NumberSymbol
                             }
@@ -91,7 +91,7 @@ RibbonTabBar {
                                     ListElement { text: "7" }
                                     ListElement { text: "8" }
                                 }
-                                enabled: SerialPortManager.closed
+                                enabled: !SerialPortManager.opened
                                 currentIndex: 3
                                 icon_source: RibbonIcons.DataWhisker
                             }
@@ -121,7 +121,7 @@ RibbonTabBar {
                                 ListElement { text: qsTr("EVEN") }
                                 ListElement { text: qsTr("ODD") }
                             }
-                            enabled: SerialPortManager.closed
+                            enabled: !SerialPortManager.opened
                             icon_source: RibbonIcons.DataWhisker
                         }
                     }
@@ -140,7 +140,7 @@ RibbonTabBar {
                                 ListElement { text: "1.5" }
                                 ListElement { text: "2" }
                             }
-                            enabled: SerialPortManager.closed
+                            enabled: !SerialPortManager.opened
                             icon_source: RibbonIcons.DataWhisker
                         }
                     }
@@ -150,12 +150,13 @@ RibbonTabBar {
                     Layout.alignment: Qt.AlignVCenter
                     icon_source: RibbonIcons.Open
                     show_tooltip: false
-                    text: SerialPortManager.closed ? qsTr("打开串口") : qsTr("关闭串口")
-                    onClicked: SerialPortManager.open(serial_port_combo.currentText,
+                    text: SerialPortManager.opened ? qsTr("关闭串口") : qsTr("打开串口")
+                    onClicked: !SerialPortManager.opened ? SerialPortManager.open(serial_port_combo.currentText,
                                                       serial_baudrate_combo.currentText,
                                                       serial_databits_combo.currentText,
                                                       serial_parity_combo.currentText,
-                                                      serial_stopbits_combo.currentText)
+                                                      serial_stopbits_combo.currentText) :
+                                                          SerialPortManager.close()
                 }
             }
         }

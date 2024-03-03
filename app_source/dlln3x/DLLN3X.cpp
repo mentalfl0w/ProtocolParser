@@ -7,7 +7,6 @@ using namespace zigbee_protocol;
 DLLN3X::DLLN3X(QObject *parent)
     : QObject{parent}
 {
-
 }
 
 DLLN3X* DLLN3X::instance(){
@@ -60,6 +59,8 @@ ZigbeeFrame DLLN3X::recv(bool non_blocked)
 
 bool DLLN3X::send(ZigbeeFrame zf)
 {
+    if(!_DSerial->isOpen())
+        return false;
     bool status = false;
     uint8_t len = zf.size();
     if (zf.getSrcPort() < 0x80 || len > 66)
@@ -281,7 +282,7 @@ enum DLLN3X::PIN_CONTROL DLLN3X::pin_control(PIN pin, PIN_CONTROL cmd)
 
 void DLLN3X::loop()
 {
-    if (_DSerial->bytesAvailable() > 7 && !_recv_lock) {
+    if (_DSerial && _DSerial->bytesAvailable() > 7 && !_recv_lock) {
         ZigbeeFrame zf = recv();
         printf("Message: ");
         for (int i = 0; i < zf.size(); i++) {
@@ -303,7 +304,8 @@ int DLLN3X::readBytesUntil(uint8_t delimiter, uint8_t* buffer, qint64 maxSize)
 {
     QByteArray data;
     qint64 bytesRead = 0;
-
+    if(!_DSerial->isOpen())
+        return bytesRead;
     if (_DSerial->bytesAvailable() || _DSerial->waitForReadyRead(2000))
         while (bytesRead < maxSize)
         {

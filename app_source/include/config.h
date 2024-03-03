@@ -21,6 +21,7 @@ public:
 private:
     Config(QString qstrfilename = "");
     ~Config(void);
+    Q_DISABLE_COPY_MOVE(Config)
     QString m_qstrFileName;
     QSettings *m_psetting=nullptr;
 };

@@ -33,6 +33,7 @@ public:
     Q_INVOKABLE void unreg_event(Event* event);
 private:
     explicit EventsBus(QObject *parent = nullptr);
+    Q_DISABLE_COPY_MOVE(EventsBus);
     QList<Event*> _events;
 };
 

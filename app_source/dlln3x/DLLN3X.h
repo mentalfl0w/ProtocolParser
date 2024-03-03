@@ -17,6 +17,8 @@ private:
     const QSerialPort::BaudRate _baud_rate_list[7] = {QSerialPort::Baud2400, QSerialPort::Baud4800, QSerialPort::Baud9600,
                                                        QSerialPort::Baud19200, QSerialPort::Baud38400, QSerialPort::Baud57600, QSerialPort::Baud115200};
     QSerialPort* _DSerial;
+    explicit DLLN3X(QObject *parent = nullptr);
+    Q_DISABLE_COPY_MOVE(DLLN3X)
     void (*_callback)(ZigbeeFrame& zf) = nullptr;
     int readBytesUntil(uint8_t delimiter, uint8_t* buf, qint64 maxSize);
     void _sleep(int msec);
@@ -33,7 +35,6 @@ public:
     };
     enum PIN_CONTROL{ OUT_HIGH = 0x11, OUT_LOW = 0x10, READ_PIN = 0x12};
     enum PIN{ DLLN3X_PIN4 = 0x44, DLLN3X_PIN5 = 0x45};
-    explicit DLLN3X(QObject *parent = nullptr);
     static DLLN3X* instance();
     void init(QSerialPort* DSerial, uint32_t baudrate = 115200);
     ZigbeeFrame recv(bool non_blocked = true);
