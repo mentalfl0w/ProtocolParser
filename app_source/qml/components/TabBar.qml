@@ -152,11 +152,11 @@ RibbonTabBar {
                     show_tooltip: false
                     text: SerialPortManager.opened ? qsTr("关闭串口") : qsTr("打开串口")
                     onClicked: !SerialPortManager.opened ? SerialPortManager.open(serial_port_combo.currentText,
-                                                      serial_baudrate_combo.currentText,
-                                                      serial_databits_combo.currentText,
-                                                      serial_parity_combo.currentText,
-                                                      serial_stopbits_combo.currentText) :
-                                                          SerialPortManager.close()
+                                                                                  serial_baudrate_combo.currentText,
+                                                                                  serial_databits_combo.currentText,
+                                                                                  serial_parity_combo.currentText,
+                                                                                  serial_stopbits_combo.currentText) :
+                                                           SerialPortManager.close()
                 }
             }
         }
@@ -289,12 +289,29 @@ RibbonTabBar {
                         text: qsTr("保存")
                         show_tooltip: false
                         onClicked: {
-                            var keys = []
-                            keys = ZigBeeParser.pre_hmac_verify_key
-                            keys.push(ZigBeeParser.hmac_verify_key)
-                            ZigBeeParser.hmac_verify_key = key_manage_edit.text
-                            ZigBeeParser.pre_hmac_verify_key = keys
-                            key_manage_edit.clear()
+                            let key = key_manage_edit.text
+                            let result = key_manage_layout.key_format_validate(key)
+                            if (result.length === 32)
+                            {
+                                var keys = []
+                                keys = ZigBeeParser.pre_hmac_verify_key
+                                keys.push(ZigBeeParser.hmac_verify_key)
+                                ZigBeeParser.hmac_verify_key = result
+                                ZigBeeParser.pre_hmac_verify_key = keys
+                                key_manage_edit.clear()
+                            }
+                            else if (result === 'le')
+                            {
+                                key_manage_edit.text = qsTr("字符长度错误，应为32！")
+                            }
+                            else if (result === 'ce')
+                            {
+                                key_manage_edit.text = qsTr("格式错误，应全大/小写！")
+                            }
+                            else
+                            {
+                                key_manage_edit.text = qsTr("格式错误，应为十六进制！")
+                            }
                         }
                     }
                 }
@@ -306,6 +323,19 @@ RibbonTabBar {
                     onClicked: {
                         show_popup("components/KeysList.qml")
                     }
+                }
+                function key_format_validate(str) {
+                    str = str.replace(/\s/g, "");
+                    if (str.length !== 32) {
+                        return "le";
+                    }
+                    if (str !== str.toUpperCase() && str !== str.toLowerCase()) {
+                        return "ce";
+                    }
+                    if (/[^0-9A-Fa-f]/.test(str)) {
+                        return "ae";
+                    }
+                    return str.toUpperCase();
                 }
             }
         }
