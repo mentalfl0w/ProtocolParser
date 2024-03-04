@@ -26,6 +26,7 @@ set(
     include/config.h source/config.cpp
     include/serialdataresolver.h source/serialdataresolver.cpp
     include/zigbeedataresolver.h source/zigbeedataresolver.cpp
+    include/eventbusresolver.h source/eventbusresolver.cpp
     languages/zh_CN.ts languages/en_US.ts
 )
 

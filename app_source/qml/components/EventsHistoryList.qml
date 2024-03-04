@@ -88,7 +88,7 @@ Item {
                 text: qsTr("清空历史")
                 enabled: EventsBus.event_history.length
                 onClicked: {
-                    EventsBus.event_history = []
+                    EventsBus.event_history=[]
                 }
             }
         }

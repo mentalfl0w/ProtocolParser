@@ -277,7 +277,10 @@ void ZigBeeDataResolver::remote_addr_parser(zigbee_protocol::ZigbeeFrame &zframe
 
 void ZigBeeDataResolver::message_parser(QJsonObject message, QString self_addr)
 {
+    QMutex mutex;
+    mutex.lock();
     _self_addr = self_addr;
+    mutex.unlock();
     if (message["type"] == "demo_verify_request")
     {
         hmac_frame frame;

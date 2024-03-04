@@ -112,7 +112,7 @@ Item {
         }
 
         add: Transition {
-            NumberAnimation { properties: "x,y"; from: list_table.height; duration: 1000 }
+            NumberAnimation { properties: "y"; from: list_table.height; duration: 200 }
         }
     }
 
