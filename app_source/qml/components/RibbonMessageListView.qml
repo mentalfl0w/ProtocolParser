@@ -32,6 +32,8 @@ RibbonView{
                 end_index = count-1
                 //console.log('append:',begin_index,end_index)
             }
+            if(count===0)
+                show_model.clear()
         }
     }
     ListModel{
@@ -40,16 +42,17 @@ RibbonView{
 
     ListView{
         id: message_list
+        cacheBuffer: message_list.height * 2
         Layout.alignment: Qt.AlignHCenter
         Layout.preferredHeight: contentHeight
         Layout.preferredWidth: parent.width
         interactive: false
         model: show_model
         add: Transition {
-            NumberAnimation { properties: "y"; from: message_list.height; duration: 200 }
+            NumberAnimation { properties: "y"; from: message_list.height; duration: 100 }
         }
         displaced: Transition {
-            NumberAnimation { properties: "y"; duration: 200 }
+            NumberAnimation { properties: "y"; duration: 100 }
         }
     }
     Connections{

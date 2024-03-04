@@ -17,12 +17,13 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
 #ifdef Q_OS_WIN
-    FramelessConfig::instance()->set(Global::Option::ForceHideWindowFrameBorder);
-    FramelessConfig::instance()->set(Global::Option::ForceNonNativeBackgroundBlur);
+    FramelessConfig::instance()->set(Global::Option::UseCrossPlatformQtImplementation);
+    //FramelessConfig::instance()->set(Global::Option::ForceHideWindowFrameBorder);
+    //FramelessConfig::instance()->set(Global::Option::ForceNonNativeBackgroundBlur);
+#else
+    FramelessConfig::instance()->set(Global::Option::EnableBlurBehindWindow);
 #endif
     FramelessConfig::instance()->set(Global::Option::CenterWindowBeforeShow);
-    FramelessConfig::instance()->set(Global::Option::EnableBlurBehindWindow);
-
     QTranslator translator;
     bool result = translator.load(QLocale::system(), u""_qs, u""_qs, u":/translations"_qs);
     if (result)

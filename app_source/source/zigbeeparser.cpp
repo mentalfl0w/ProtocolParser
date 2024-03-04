@@ -49,13 +49,10 @@ ZigBeeParser* ZigBeeParser::instance()
 
 void ZigBeeParser::message_parser(QJsonObject message)
 {
-    emit message_recved(message, _self_addr, _allow_list, _deny_list, _wait_queue);
+    emit message_recved(message, _self_addr);
 }
 
-void ZigBeeParser::bus_data_send(QString type, QJsonObject data, QList<uint16_t> allow_list, QList<uint16_t> deny_list, QList<uint16_t> wait_queue)
+void ZigBeeParser::bus_data_send(QString type, QJsonObject data)
 {
     _bus->push_data(type, data);
-    _allow_list = allow_list;
-    _deny_list = deny_list;
-    _wait_queue = wait_queue;
 }

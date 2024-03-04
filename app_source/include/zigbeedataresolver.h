@@ -11,8 +11,11 @@ class ZigBeeDataResolver : public QObject
     Q_OBJECT
 public:
     static ZigBeeDataResolver* instance();
+    QList<uint16_t>& get_allow_list(){return _allow_list;};
+    QList<uint16_t>& get_deny_list(){return _deny_list;};
+    QList<uint16_t>& get_wait_queue(){return _wait_queue;};
 public slots:
-    void message_parser(QJsonObject message, QString self_addr, QList<uint16_t> allow_list, QList<uint16_t> deny_list, QList<uint16_t> wait_queue);
+    void message_parser(QJsonObject message, QString self_addr);
 private:
     explicit ZigBeeDataResolver(QObject *parent = nullptr);
     ~ZigBeeDataResolver();
@@ -26,7 +29,7 @@ private:
     QMap<uint16_t, QPair<device,device>> nodes;
     QList<uint16_t> _allow_list,_deny_list,_wait_queue;
 signals:
-    void data_send(QString type, QJsonObject data, QList<uint16_t> allow_list, QList<uint16_t> deny_list, QList<uint16_t> wait_queue);
+    void data_send(QString type, QJsonObject data);
 };
 
 #endif // ZIGBEEDATARESOLVER_H

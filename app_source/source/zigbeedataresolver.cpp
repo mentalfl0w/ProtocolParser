@@ -89,7 +89,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
         object.insert("recieved", true);
         object.insert("sender", sender);
         object.insert("type","zigbee_identify_data");
-        emit data_send("zigbee_identify_data_view",object,_allow_list,_deny_list,_wait_queue);
+        emit data_send("zigbee_identify_data_view",object);
         return;
     }
     switch (zframe.getDesPort()) {
@@ -102,7 +102,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
         object.insert("note_text",QJsonValue("收到节点0x"+ sender +"发送的验证信息"));
         object.insert("recieved", true);
         object.insert("type","zigbee_identify_data");
-        emit data_send("zigbee_identify_data_view",object,_allow_list,_deny_list,_wait_queue);
+        emit data_send("zigbee_identify_data_view",object);
         if (_allow_list.contains(node->first.addr))
         {
             u8 hmac[33]="";
@@ -127,9 +127,9 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                 object.insert("recieved", false);
                 object.insert("sender", QString::number(_protocol->self_addr,16).toUpper());
                 object.insert("type","zigbee_identify_data");
-                emit data_send("zigbee_identify_data_view",object,_allow_list,_deny_list,_wait_queue);
+                emit data_send("zigbee_identify_data_view",object);
                 if(!is_demo)
-                    emit data_send("serial_port",object,_allow_list,_deny_list,_wait_queue);
+                    emit data_send("serial_port",object);
             }
             else
             {
@@ -158,9 +158,9 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                         object.insert("recieved", false);
                         object.insert("sender", QString::number(_protocol->self_addr,16).toUpper());
                         object.insert("type","zigbee_identify_data");
-                        emit data_send("zigbee_identify_data_view",object,_allow_list,_deny_list,_wait_queue);
+                        emit data_send("zigbee_identify_data_view",object);
                         if(!is_demo)
-                            emit data_send("serial_port",object,_allow_list,_deny_list,_wait_queue);
+                            emit data_send("serial_port",object);
                         return;
                     }
                 }
@@ -168,7 +168,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                 object.insert("recieved", true);
                 object.insert("sender", sender);
                 object.insert("type","zigbee_identify_data");
-                emit data_send("zigbee_identify_data_view",object,_allow_list,_deny_list,_wait_queue);
+                emit data_send("zigbee_identify_data_view",object);
             }
         }
         else if(_deny_list.contains(node->first.addr))
@@ -178,7 +178,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("note_text",QJsonValue("节点0x"+QString::number(((base_frame *)zframe.getData().data())->ori_addr,16).toUpper()+"被禁止接入"));
             object.insert("recieved", true);
             object.insert("type","zigbee_identify_data");
-            emit data_send("zigbee_identify_data_view",object,_allow_list,_deny_list,_wait_queue);
+            emit data_send("zigbee_identify_data_view",object);
         }
         else {
             if (!_wait_queue.contains(node->first.addr))
@@ -189,7 +189,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                 object.insert("note_text",QJsonValue("节点0x"+QString::number(((base_frame *)zframe.getData().data())->ori_addr,16).toUpper()+"进入等待队列"));
                 object.insert("recieved", true);
                 object.insert("type","zigbee_identify_data");
-                emit data_send("zigbee_identify_data_view",object,_allow_list,_deny_list,_wait_queue);
+                emit data_send("zigbee_identify_data_view",object);
             }
             else
             {
@@ -198,7 +198,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                 object.insert("note_text",QJsonValue("节点0x"+QString::number(((base_frame *)zframe.getData().data())->ori_addr,16).toUpper()+"已在等待队列"));
                 object.insert("recieved", true);
                 object.insert("type","zigbee_identify_data");
-                emit data_send("zigbee_identify_data_view",object,_allow_list,_deny_list,_wait_queue);
+                emit data_send("zigbee_identify_data_view",object);
             }
         }
         break;
@@ -231,7 +231,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("type","zigbee_recv_data");
             if (QRandomGenerator::global()->bounded(2)!=0 && is_demo)
                 object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
-            emit data_send("zigbee_recv_data_view",object,_allow_list,_deny_list,_wait_queue);
+            emit data_send("zigbee_recv_data_view",object);
         }
         else
         {
@@ -240,7 +240,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("note_text",QJsonValue("收到节点0x"+sender+"发送的数据,但节点并未认证"));
             object.insert("recieved", true);
             object.insert("type","zigbee_recv_data");
-            emit data_send("zigbee_recv_data_view",object,_allow_list,_deny_list,_wait_queue);
+            emit data_send("zigbee_recv_data_view",object);
             node->second.id=0;
             new_data_frame(5) dframe;
             memset(&dframe,0,sizeof (dframe));
@@ -256,7 +256,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("note_text",QJsonValue("向节点0x"+sender+"发送重置命令"));
             object.insert("recieved", false);
             object.insert("type","zigbee_recv_data");
-            emit data_send("zigbee_recv_data_view",object,_allow_list,_deny_list,_wait_queue);
+            emit data_send("zigbee_recv_data_view",object);
         }
     }
     default:
@@ -275,12 +275,9 @@ void ZigBeeDataResolver::remote_addr_parser(zigbee_protocol::ZigbeeFrame &zframe
     }
 }
 
-void ZigBeeDataResolver::message_parser(QJsonObject message, QString self_addr, QList<uint16_t> allow_list, QList<uint16_t> deny_list, QList<uint16_t> wait_queue)
+void ZigBeeDataResolver::message_parser(QJsonObject message, QString self_addr)
 {
     _self_addr = self_addr;
-    _allow_list = allow_list;
-    _deny_list = deny_list;
-    _wait_queue = wait_queue;
     if (message["type"] == "demo_verify_request")
     {
         hmac_frame frame;
