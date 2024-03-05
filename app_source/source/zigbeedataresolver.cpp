@@ -60,6 +60,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
     QString sender = QString::number(((base_frame *)zframe.getData().data())->ori_addr,16).toUpper();
     device temp,self;
     QPair<device,device>* node = nullptr;
+    bool addr_check = false, id_check = false, reset_flag_check = false;
     memset(&temp,0,sizeof(temp));
     memset(&temp,0,sizeof(self));
     self.addr = _protocol->self_addr;
@@ -74,7 +75,10 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
     }
     node = &nodes[((base_frame *)zframe.getData().data())->ori_addr];
     bframe = (base_frame*)zframe.getData().data();
-    if (is_demo || bframe->des_addr == _protocol->self_addr && (node->first.id == 0||bframe->reset_num==0xDD||((bframe->id > node->first.id && bframe->id<=BASE_FRAME_RESET_NUM))))
+    addr_check = bframe->des_addr == _protocol->self_addr;
+    id_check = node->first.id == 0 || ((bframe->id > node->first.id && bframe->id<=BASE_FRAME_RESET_NUM));
+    reset_flag_check = bframe->reset_num==0xDD;
+    if (is_demo || addr_check && (id_check||reset_flag_check))
     {
         node->first.addr = bframe->ori_addr;
         node->first.id = bframe->id;
@@ -83,9 +87,14 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
     }
     else
     {
+        QString error_str;
         QJsonObject object;
+        if (!addr_check)
+            error_str += "，地址错误，包目的地址为：0x" + QString::number(bframe->des_addr, 16).toUpper();
+        if(!(id_check||reset_flag_check))
+            error_str += "，包id错误，且重置标志位未标记为生效，当前包ID为：" + QString::number(bframe->id) + "，系统存储ID为" + QString::number(node->first.id);
         object.insert("text",QJsonValue(QString(zdata.toHex(' ').toUpper())));
-        object.insert("note_text",QJsonValue("请注意，节点0x"+QString::number(node->first.addr,16).toUpper()+"发送的该数据包损坏"));
+        object.insert("note_text",QJsonValue("请注意，节点0x"+QString::number(node->first.addr,16).toUpper()+"发送的该数据包损坏"+error_str));
         object.insert("recieved", true);
         object.insert("sender", sender);
         object.insert("type","zigbee_recv_data");
