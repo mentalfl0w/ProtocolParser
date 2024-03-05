@@ -1,5 +1,4 @@
 #include "zigbeeparser.h"
-#include "crypto.h"
 #include <QMutex>
 #include <QThread>
 #include <QRandomGenerator>

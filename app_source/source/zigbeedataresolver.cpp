@@ -88,7 +88,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
         object.insert("note_text",QJsonValue("请注意，节点0x"+QString::number(node->first.addr,16).toUpper()+"发送的该数据包损坏"));
         object.insert("recieved", true);
         object.insert("sender", sender);
-        object.insert("type","zigbee_identify_data");
+        object.insert("type","zigbee_recv_data");
         emit data_send("zigbee_identify_data_view",object);
         return;
     }
@@ -216,19 +216,21 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             new_data_frame(72) ndata;
             uint8_t data_len = 0;
             memset(&ndata,0,sizeof(ndata));
-            if (*(u16 *)frame == CRYPTO_ZDATA_FRAME_HEAD)
-            {
-                czdata = (crypto_zdata_frame*)frame;
-                _protocol->zigbee_data_dectypt((uint8_t*)&ndata, &data_len, czdata, Crypto::SM4_decrypt);
-                dzf.setData((char*)&ndata,ndata.data_length + DATA_FRAME_PREFIX_LEN);
-                zdata = QByteArray((char *)dzf.data(), dzf.size());
-                object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
-            }
             object.insert("sender", sender);
             object.insert("text",QJsonValue(QString(zdata.toHex(' ').toUpper())));
             object.insert("note_text",QJsonValue("收到节点0x"+sender+"发送的数据"));
             object.insert("recieved", true);
             object.insert("type","zigbee_recv_data");
+            if (*(u16 *)frame == CRYPTO_ZDATA_FRAME_HEAD)
+            {
+                QByteArray ddata((char*)dzf.data(),BASE_FRAME_PREFIX_LEN);
+                czdata = (crypto_zdata_frame*)frame;
+                _protocol->zigbee_data_dectypt((uint8_t*)&ndata, &data_len, czdata, Crypto::SM4_decrypt);
+                ddata.append((char*)&ndata,ndata.data_length + DATA_FRAME_PREFIX_LEN);
+                dzf.setData(ddata.data(),ddata.length());
+                zdata += QByteArray((char *)dzf.data(), dzf.size());
+                object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
+            }
             if (QRandomGenerator::global()->bounded(2)!=0 && is_demo)
                 object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
             emit data_send("zigbee_recv_data_view",object);
@@ -258,6 +260,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("type","zigbee_recv_data");
             emit data_send("zigbee_recv_data_view",object);
         }
+        break;
     }
     default:
         break;
