@@ -98,7 +98,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
         object.insert("recieved", true);
         object.insert("sender", sender);
         object.insert("type","zigbee_recv_data");
-        emit data_send("zigbee_identify_data_view",object);
+        emit data_send("zigbee_recv_data",object);
         return;
     }
     switch (zframe.getDesPort()) {
@@ -221,7 +221,6 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
         QJsonObject object;
         if (node->first.verified)
         {
-            zigbee_protocol::ZigbeeFrame dzf = zframe;
             new_data_frame(72) ndata;
             uint8_t data_len = 0;
             memset(&ndata,0,sizeof(ndata));
@@ -232,13 +231,17 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("type","zigbee_recv_data");
             if (*(u16 *)frame == CRYPTO_ZDATA_FRAME_HEAD)
             {
-                QByteArray ddata((char*)dzf.data(),BASE_FRAME_PREFIX_LEN);
+                new_base_frame(sizeof(ndata)) nbframe;
+                memcpy(&nbframe, bframe, BASE_FRAME_PREFIX_LEN);
+                zigbee_protocol::ZigbeeFrame nzframe = zframe;
                 czdata = (crypto_zdata_frame*)frame;
                 _protocol->zigbee_data_dectypt((uint8_t*)&ndata, &data_len, czdata, Crypto::SM4_decrypt);
-                ddata.append((char*)&ndata,ndata.data_length + DATA_FRAME_PREFIX_LEN);
-                dzf.setData(ddata.data(),ddata.length());
-                zdata += QByteArray((char *)dzf.data(), dzf.size());
+                memcpy(nbframe.data, &ndata, ndata.data_length + DATA_FRAME_PREFIX_LEN);
+                nbframe.length = BASE_FRAME_PREFIX_LEN + ndata.data_length + DATA_FRAME_PREFIX_LEN;
+                nzframe.setData((char*)&nbframe,nbframe.length);
+                zdata = QByteArray((char *)nzframe.data(), nzframe.size());
                 object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
+                object.insert("note_text",QJsonValue("解密数据为未加密传输时的原始数据包"));
             }
             if (QRandomGenerator::global()->bounded(2)!=0 && is_demo)
                 object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));

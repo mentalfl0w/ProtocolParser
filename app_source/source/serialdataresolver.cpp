@@ -15,7 +15,8 @@ SerialDataResolver::SerialDataResolver(QObject *parent)
         {
             _zigbee->init(_serial, _serial->baudRate());
             zigbee_protocol::Protocol::getInstance()->self_addr = _zigbee->read_addr();
-            connect(_zigbee, &zigbee_protocol::DLLN3X::recved, this, &SerialDataResolver::zigbee_callback);
+            connect(_zigbee, &zigbee_protocol::DLLN3X::recved, this, &SerialDataResolver::zigbee_callback,
+                    Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection));
         }
         else
         {
@@ -109,7 +110,8 @@ void SerialDataResolver::open(QString port_name, QString baudrate, QString datab
         {
             _zigbee->init(_serial, _serial->baudRate());
             zigbee_protocol::Protocol::getInstance()->self_addr = _zigbee->read_addr();
-            connect(_zigbee, &zigbee_protocol::DLLN3X::recved, this, &SerialDataResolver::zigbee_callback);
+            connect(_zigbee, &zigbee_protocol::DLLN3X::recved, this, &SerialDataResolver::zigbee_callback,
+                    Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection));
         }
     }
 }
@@ -186,6 +188,7 @@ void SerialDataResolver::close()
     serial_opened(false);
     disconnect(_serial,&QSerialPort::aboutToClose,this,&SerialDataResolver::close);
     disconnect(_zigbee, &zigbee_protocol::DLLN3X::recved, this, &SerialDataResolver::zigbee_callback);
+
     if(_serial->isOpen())
     {
         _serial->clear();
