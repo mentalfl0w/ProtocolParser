@@ -254,18 +254,20 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                 QStringList name_list, type_list;
                 name_list = Config::instance()->getArray("Protocol", "data_frame_name").toStringList();
                 type_list = Config::instance()->getArray("Protocol", "data_frame_type").toStringList();
+                if (!name_list.length())
+                    break;
                 note_text += "传感器数据：";
                 void* pdata = (void *)ddata->data;
                 for (uint8_t i = 0; i < name_list.length(); i++)
                 {
                     note_text += name_list[i]+ ":" + sensor_data_reader(&pdata,type_list[i]) + ' ';
                 }
+                object.insert("note_text",QJsonValue(note_text));
                 break;
             }
             default:
                 break;
             }
-            object.insert("note_text",QJsonValue(note_text));
             if (QRandomGenerator::global()->bounded(2)!=0 && is_demo)
                 object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
             emit data_send("zigbee_recv_data_view",object);

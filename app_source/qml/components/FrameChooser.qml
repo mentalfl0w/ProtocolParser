@@ -34,7 +34,7 @@ Item {
 
     Component.onCompleted: {
         let result = Config.getArray('Protocol', 'data_frame_name')
-        if (result)
+        if (result.length)
         {
             frame_model.clear()
             var name_array=[],type_array=[]
