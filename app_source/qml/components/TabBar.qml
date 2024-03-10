@@ -404,8 +404,8 @@ RibbonTabBar {
                     }
 
                     let repeat_count = 16
-                    let t = `FF 29 ${get_rand_byte()}${get_rand_byte()} 83 56 56 `+
-                        `AA AD 56 56 52 48 23 32 01 00 17 00 00 00 AA AA 01 10 00 FF FF `
+                    let t = `FF 2B ${get_rand_byte()}${get_rand_byte()} 83 56 56 `+
+                        `AA AD 56 56 EE EE 56 56 01 00 26 00 00 00 AA AA 01 FF 10 00 FF FF `
                     for (let j=0;j<repeat_count;j++){
                         t+=` ${get_rand_byte()}${get_rand_byte()}`
                     }
@@ -453,6 +453,28 @@ RibbonTabBar {
                         function onTheme_modeChanged(){
                             let str = (RibbonTheme.theme_mode === RibbonThemeType.System ? qsTr("跟随系统") : RibbonTheme.theme_mode === RibbonThemeType.Light ? qsTr("浅色") : qsTr("深色"))
                             theme_combobox.currentIndex = theme_combobox.find(str)
+                        }
+                    }
+                }
+            }
+        }
+        RibbonTabGroup{
+            text: qsTr("数据结构自定义")
+            width: frame_custom_layout.width + 30
+            RowLayout{
+                id: frame_custom_layout
+                anchors.centerIn: parent
+                height: parent.height
+                spacing: 10
+                ColumnLayout{
+                    spacing: 10
+                    RibbonButton{
+                        Layout.fillWidth: true
+                        icon_source: RibbonIcons.CodeTextEdit
+                        text: qsTr("自定义数据帧")
+                        tip_text: qsTr("自定义传感器数据帧结构")
+                        onClicked: {
+                            show_popup("components/FrameChooser.qml")
                         }
                     }
                 }

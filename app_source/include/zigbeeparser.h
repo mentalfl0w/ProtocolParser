@@ -33,9 +33,9 @@ public:
     QList<uint16_t> wait_queue(){if(!_resolver)_resolver=ZigBeeDataResolver::instance();return _resolver->get_wait_queue();};
     void setWait_queue(QList<uint16_t> wait_queue){if(!_resolver)_resolver=ZigBeeDataResolver::instance();QList<uint16_t> &a=_resolver->get_wait_queue();a=wait_queue;emit wait_queueChanged();};
     QString hmac_verify_key(){ return _protocol->hmac_verify_key;};
-    void setHmac_verify_key(QString key){ _config->Set("Protocol","hmac_verify_key",key); _protocol->hmac_verify_key = key;emit hmac_verify_keyChanged();};
+    void setHmac_verify_key(QString key){ _config->set("Protocol","hmac_verify_key",key); _protocol->hmac_verify_key = key;emit hmac_verify_keyChanged();};
     QStringList pre_hmac_verify_key(){ return _protocol->pre_hmac_verify_key;};
-    void setPre_hmac_verify_key(QStringList keys){ _config->SetArray("Protocol","pre_hmac_verify_key",keys); _protocol->pre_hmac_verify_key = keys;emit pre_hmac_verify_keyChanged();};
+    void setPre_hmac_verify_key(QStringList keys){ _config->setArray("Protocol","pre_hmac_verify_key",keys); _protocol->pre_hmac_verify_key = keys;emit pre_hmac_verify_keyChanged();};
     static ZigBeeParser* instance();
     static ZigBeeParser* create(QQmlEngine *qmlEngine, QJSEngine *jsEngine){return instance();}
     void message_parser(QJsonObject message);

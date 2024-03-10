@@ -14,21 +14,22 @@ Item{
     property double bottom_padding: 0
     property bool handle_serial: true
 
-    onAuto_scroll_to_bottomChanged: if(auto_scroll_to_bottom) serial_view.scroll_to_bottom()
+    onAuto_scroll_to_bottomChanged: {
+        serial_view.auto_scroll_to_bottom = auto_scroll_to_bottom
+        if(auto_scroll_to_bottom)
+            serial_view.scroll_to_bottom()
+    }
 
     RibbonMessageListView{
         id: serial_view
         anchors.fill: parent
         top_padding: serial_title_bar.height + control.top_padding + (!RibbonTheme.modern_style ? 10 : 0)
         bottom_padding: message_sender.height + control.bottom_padding
+        auto_scroll_to_bottom: control.auto_scroll_to_bottom
         delegate: ZigBeeMessage{
             sender_text: `${model.time} ${model.recieved ? '收' : '发'}`
             show_tooltip: control.show_tooltip
             component_width: serial_view.width / 2
-        }
-        view.onHeightChanged: {
-            if (control.auto_scroll_to_bottom)
-                scroll_to_bottom()
         }
         Connections{
             target: SerialPortManager

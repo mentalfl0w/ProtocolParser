@@ -93,7 +93,30 @@ Item {
                                 view_only: true
                                 text: modelData.data
                                 wrapMode: RibbonText.WordWrap
-                                color: RibbonTheme.dark_mode ? mouse.containsMouse ? 'black' : 'white' : mouse.containsMouse ? 'white':'black'
+                                color: {
+                                    if(RibbonTheme.dark_mode)
+                                    {
+                                        if(mouse.containsMouse&&!row_bg.selected)
+                                            return 'black'
+                                        else if(mouse.containsMouse&&row_bg.selected)
+                                            return 'white'
+                                        else if(!mouse.containsMouse&&row_bg.selected)
+                                            return 'black'
+                                        else
+                                            return 'white'
+                                    }
+                                    else
+                                    {
+                                        if(mouse.containsMouse&&!row_bg.selected)
+                                            return 'white'
+                                        else if(mouse.containsMouse&&row_bg.selected)
+                                            return 'black'
+                                        else if(!mouse.containsMouse&&row_bg.selected)
+                                            return 'white'
+                                        else
+                                            return 'black'
+                                    }
+                                }
                             }
                         }
                     }
@@ -113,6 +136,11 @@ Item {
 
         add: Transition {
             NumberAnimation { properties: "y"; from: list_table.height; duration: 200 }
+        }
+
+        ScrollBar.vertical: ScrollBar {
+            anchors.right: list_table.right
+            anchors.rightMargin: 2
         }
     }
 

@@ -31,9 +31,6 @@ int main(int argc, char *argv[])
     QList<int> verl = {PROTOCOLPARSER_VERSION};
     QString version = QString::number(verl[0])+'.'+QString::number(verl[1])+'.'+QString::number(verl[2]);
     engine.rootContext()->setContextProperty("PPAPP_Version",version);
-#ifdef RIBBONUI_BUILD_STATIC_LIB
-    engine.addImportPath("qrc:/");
-#endif
     const QUrl url(u"qrc:/qt/qml/ProtocolParser/Main.qml"_qs);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
         &app, [url](QObject *obj, const QUrl &objUrl) {

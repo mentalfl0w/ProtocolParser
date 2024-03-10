@@ -7,7 +7,7 @@ import ProtocolParser
 Item {
     id:obj
     property var header_items: ["序号","事件"]
-    property var header_items_width: [100,400]
+    property var header_items_width: [100,700]
     property var data_source: []
     implicitHeight: list_layout.height
     implicitWidth: list_layout.width
@@ -21,7 +21,7 @@ Item {
         var data = []
         for (var i = 0; i < EventsBus.event_history.length; i++)
         {
-            data.push({"序号":i+1,"事件":JSON.stringify(EventsBus.event_history)})
+            data.push({"序号":i+1,"事件":JSON.stringify(EventsBus.event_history[i])})
         }
         data_source = data
     }
@@ -32,7 +32,7 @@ Item {
             var data = []
             for (var i = 0; i < EventsBus.event_history.length; i++)
             {
-                data.push({"序号":i+1,"事件":JSON.stringify(EventsBus.event_history)})
+                data.push({"序号":i+1,"事件":JSON.stringify(EventsBus.event_history[i])})
             }
             data_source = data
         }

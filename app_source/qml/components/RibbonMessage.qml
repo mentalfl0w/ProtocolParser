@@ -8,11 +8,12 @@ Rectangle{
     color: "transparent"
     property double padding: 10
     default property alias content: message_layout.data
-    property var data_model:model
+    property var data_model: model
     property int font_size: 13
     property string sender_text: "sender"
     width: ListView.view.width
     height: bubble_layout.height + padding*2
+
     ColumnLayout{
         id: bubble_layout
         anchors{

@@ -43,7 +43,10 @@ Item{
             identify_view.scroll_to_bottom()
             data_view.scroll_to_bottom()
         }
+        identify_view.auto_scroll_to_bottom = auto_scroll_to_bottom
+        data_view.auto_scroll_to_bottom = auto_scroll_to_bottom
     }
+
     Item{
         anchors{
             top:parent.top
@@ -56,13 +59,10 @@ Item{
             anchors.fill: parent
             top_padding: control.top_padding + identify_title_bar.height + (!RibbonTheme.modern_style ? 10 : 0)
             bottom_padding: control.bottom_padding
+            auto_scroll_to_bottom: control.auto_scroll_to_bottom
             delegate: ZigBeeMessage{
                 show_tooltip: control.show_tooltip
                 component_width: identify_view.width / 2
-            }
-            view.onHeightChanged: {
-                if (control.auto_scroll_to_bottom)
-                    scroll_to_bottom()
             }
             Event{
                 id:identify_view_event

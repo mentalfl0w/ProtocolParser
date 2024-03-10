@@ -35,12 +35,12 @@ Config* Config::instance()
     return singleton;
 }
 
-void Config::Set(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue)
+void Config::set(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue)
 {
     m_psetting->setValue(QString("/%1/%2").arg(qstrnodename).arg(qstrkeyname), qvarvalue);
 }
 
-void Config::SetArray(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue)
+void Config::setArray(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue)
 {
     m_psetting->beginWriteArray(QString("/%1/%2").arg(qstrnodename).arg(qstrkeyname));
     QList<QVariant> list = qvarvalue.toList();
@@ -52,13 +52,13 @@ void Config::SetArray(QString qstrnodename,QString qstrkeyname,QVariant qvarvalu
     m_psetting->endArray();
 }
 
-QVariant Config::Get(QString qstrnodename,QString qstrkeyname)
+QVariant Config::get(QString qstrnodename,QString qstrkeyname)
 {
     QVariant qvar = m_psetting->value(QString("/%1/%2").arg(qstrnodename).arg(qstrkeyname));
     return qvar;
 }
 
-QVariant Config::GetArray(QString qstrnodename,QString qstrkeyname)
+QVariant Config::getArray(QString qstrnodename,QString qstrkeyname)
 {
     QList<QVariant> list;
     int size = m_psetting->beginReadArray(QString("/%1/%2").arg(qstrnodename).arg(qstrkeyname));

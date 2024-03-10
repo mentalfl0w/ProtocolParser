@@ -10,7 +10,9 @@ import "components"
 RibbonWindow {
     id:root
     width: 1200
+    minimumWidth: 1200
     height: 800
+    minimumHeight: 800
     title: qsTr("Protocol Parser") + ` V${PPAPP_Version}`
 
     TabBar{

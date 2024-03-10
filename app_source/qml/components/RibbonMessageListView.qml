@@ -12,80 +12,53 @@ RibbonView{
     spacing: 0
 
     property int max_msg_num: 10
+    property bool auto_scroll_to_bottom: false
+    property int animation_time: 200
     property alias delegate: message_list.delegate
     property alias message_model: message_model
     property alias view: message_list
 
     ListModel{
         id: message_model
-        property int begin_index: 0
-        property int end_index: 0
-        onCountChanged: {
-            if (end_index == count - 2 || begin_index == end_index)
-            {
-                while(show_model.count > max_msg_num)
-                {
-                    show_model.remove(0)
-                    begin_index++
-                }
-                show_model.append(message_model.get(count - 1))
-                end_index = count-1
-                //console.log('append:',begin_index,end_index)
-            }
-            if(count===0)
-                show_model.clear()
-        }
+        onCountChanged: auto_scroll_btn_timer.restart()
     }
-    ListModel{
-        id: show_model
+
+    Timer{
+        id: auto_scroll_btn_timer
+        interval: animation_time
+        repeat: false
+        onTriggered: {
+            if(view.auto_scroll_to_bottom)
+                view.scroll_to_bottom()
+        }
     }
 
     ListView{
         id: message_list
         cacheBuffer: message_list.height * 2
         Layout.alignment: Qt.AlignHCenter
-        Layout.preferredHeight: contentHeight
+        Layout.preferredHeight: parent.height
         Layout.preferredWidth: parent.width
-        interactive: false
-        model: show_model
+        model: message_model
         add: Transition {
-            NumberAnimation { properties: "y"; from: message_list.height; duration: 100 }
+            NumberAnimation {
+                properties: "y"
+                from: message_list.height
+                duration: animation_time
+            }
         }
-        displaced: Transition {
-            NumberAnimation { properties: "y"; duration: 100 }
+        ScrollBar.vertical: ScrollBar {
+            anchors.right: message_list.right
+            anchors.rightMargin: 2
         }
     }
-    Connections{
-        target: view
-        function onPull_up_triggered()
-        {
-            for(let i = message_model.begin_index - 1, count = 0;
-                i >= 0 && count < max_msg_num; i--,count++ )
-            {
-                show_model.insert(0,message_model.get(i))
-                message_model.begin_index = i
-                if (show_model.count > max_msg_num + 2)
-                {
-                    show_model.remove(show_model.count - 1)
-                    message_model.end_index--
-                }
-            }
-            //console.log('up:',message_model.begin_index,message_model.end_index)
-        }
-        function onPull_down_triggered()
-        {
-            for(let i = message_model.end_index + 1, count = 0;
-                i < message_model.count && count < max_msg_num; i++,count++ )
-            {
-                show_model.append(message_model.get(i))
-                message_model.end_index = i
-                if (show_model.count > max_msg_num)
-                {
-                    show_model.remove(0)
-                    message_model.begin_index++
-                }
-            }
-            //console.log('down:',message_model.begin_index,message_model.end_index)
-        }
+
+    function scroll_to_up(){
+        message_list.positionViewAtBeginning()
     }
+
+    function scroll_to_bottom(){
+        message_list.positionViewAtEnd()
+    }
+
 }

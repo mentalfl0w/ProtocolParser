@@ -2,12 +2,22 @@ cmake_minimum_required(VERSION 3.21)
 
 project(ProtocolParser VERSION ${CMAKE_PROJECT_VERSION} LANGUAGES CXX)
 
-set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(QT_VERSION VERSION_GREATER_EQUAL "6.3")
+    qt_standard_project_setup()
+    qt_policy(SET QTP0001 NEW)
+else()
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTORCC ON)
+    set(CMAKE_AUTOUIC ON)
+endif()
 
 if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
 endif()
+
+set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR}/app_source CACHE STRING "Qt Creator extra QML import paths" FORCE)
 
 set(PROJECT_COMPANY "Mentalflow's Lab")
 set(PROJECT_COPYRIGHT "Copyright (c) 2023 Mentalflow's Lab. All rights reserved.")
@@ -36,7 +46,7 @@ set(
     qml/components/ZigBeeMessage.qml qml/components/SerialPortAssistant.qml
     qml/components/ZigBeeDataView.qml qml/components/TabBar.qml qml/components/CenterView.qml
     qml/components/ListTable.qml qml/components/DeviceList.qml qml/components/KeysList.qml
-    qml/components/EventsHistoryList.qml
+    qml/components/EventsHistoryList.qml qml/components/FrameChooser.qml
 )
 
 INCLUDE_DIRECTORIES(dlln3x include)

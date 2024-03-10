@@ -221,6 +221,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
         QJsonObject object;
         if (node->first.verified)
         {
+            QString note_text;
             new_data_frame(72) ndata;
             uint8_t data_len = 0;
             memset(&ndata,0,sizeof(ndata));
@@ -231,7 +232,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("type","zigbee_recv_data");
             if (*(u16 *)frame == CRYPTO_ZDATA_FRAME_HEAD)
             {
-                QString note_text = "解密数据为按照未加密传输重新打包的原始数据，因此数据长度会有差异\n";
+                note_text = "解密数据为按照未加密传输重新打包的原始数据，因此数据长度会有差异\n";
                 new_base_frame(sizeof(ndata)) nbframe;
                 memcpy(&nbframe, bframe, BASE_FRAME_PREFIX_LEN);
                 zigbee_protocol::ZigbeeFrame nzframe = zframe;
@@ -242,22 +243,29 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                 nzframe.setData((char*)&nbframe,nbframe.length);
                 zdata = QByteArray((char *)nzframe.data(), nzframe.size());
                 object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
-                switch (ndata.type) {
-                case SENSOR_DATA_TYPE:
-                {
-                    note_text += "传感器数据：";
-                    sensor_data* sdata = (sensor_data*)ndata.data;
-                    note_text += "PPM:" + QString::number(sdata->ppm) + ' ';
-                    note_text += "Temperature:" + QString::number(sdata->temp) + ' ';
-                    note_text += "Humidity:" + QString::number(sdata->humi) + ' ';
-                    note_text += "Flare:" + QString::number(sdata->flare) + ' ';
-                    break;
-                }
-                default:
-                    break;
-                }
-                object.insert("note_text",QJsonValue(note_text));
+                ddata = (data_frame*)&ndata;
             }
+            else{
+                ddata = (data_frame*)frame;
+            }
+            switch (ddata->type) {
+            case SENSOR_DATA_TYPE:
+            {
+                QStringList name_list, type_list;
+                name_list = Config::instance()->getArray("Protocol", "data_frame_name").toStringList();
+                type_list = Config::instance()->getArray("Protocol", "data_frame_type").toStringList();
+                note_text += "传感器数据：";
+                void* pdata = (void *)ddata->data;
+                for (uint8_t i = 0; i < name_list.length(); i++)
+                {
+                    note_text += name_list[i]+ ":" + sensor_data_reader(&pdata,type_list[i]) + ' ';
+                }
+                break;
+            }
+            default:
+                break;
+            }
+            object.insert("note_text",QJsonValue(note_text));
             if (QRandomGenerator::global()->bounded(2)!=0 && is_demo)
                 object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
             emit data_send("zigbee_recv_data_view",object);
@@ -352,4 +360,60 @@ void ZigBeeDataResolver::message_parser(QJsonObject message, QString self_addr)
         zf.load_package((uint8_t*)bdata.data(),bdata.length());
         data_parser(zf, message["type"] == "demo_recv_data");
     }
+}
+
+QString ZigBeeDataResolver::sensor_data_reader(void **data,QString type)
+{
+    QString d;
+    uint8_t** pdata = (uint8_t**)(data);
+    if (type.contains("64"))
+    {
+        if(type.contains("u"))
+            d = QString::number(*(uint64_t*)(*data));
+        else
+            d = QString::number(*(int64_t*)(*data));
+        *pdata += sizeof(uint64_t);
+        return d;
+    }
+    else if (type.contains("32"))
+    {
+        if(type.contains("u"))
+            d = QString::number(*(uint32_t*)(*data));
+        else
+            d = QString::number(*(int32_t*)(*data));
+        *pdata += sizeof(uint32_t);
+        return d;
+    }
+    else if (type.contains("16"))
+    {
+        if(type.contains("u"))
+            d = QString::number(*(uint16_t*)(*data));
+        else
+            d = QString::number(*(int16_t*)(*data));
+        *pdata += sizeof(uint16_t);
+        return d;
+    }
+    else if (type.contains("8"))
+    {
+        if(type.contains("u"))
+            d = QString::number(*(uint8_t*)(*data));
+        else
+            d = QString::number(*(int8_t*)(*data));
+        *pdata += sizeof(uint8_t);
+        return d;
+    }
+    else if (type=="float")
+    {
+        d = QString::number(*(float*)(*data), 'g', 1);
+        *pdata += sizeof(float);
+        return d;
+    }
+    else if (type=="double")
+    {
+        d = QString::number(*(double*)(*data), 'g', 1);
+        *pdata += sizeof(double);
+        return d;
+    }
+    else
+        return d;
 }

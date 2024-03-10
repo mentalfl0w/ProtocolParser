@@ -24,6 +24,7 @@ private:
     void src_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is_demo = false);
     void des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is_demo = false);
     void remote_addr_parser(zigbee_protocol::ZigbeeFrame &zframe, bool is_demo = false);
+    QString sensor_data_reader(void **data,QString type);
     zigbee_protocol::Protocol* _protocol = nullptr;
     QString _self_addr;
     QMap<uint16_t, QPair<device,device>> nodes;

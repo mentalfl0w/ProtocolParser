@@ -9,17 +9,18 @@ class Config : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
+    QML_SINGLETON
     QML_NAMED_ELEMENT(Config)
 public:
     static Config* instance();
     static Config* create(QQmlEngine *qmlEngine, QJSEngine *jsEngine){return instance();}
-    Q_INVOKABLE void Set(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue);
-    Q_INVOKABLE void SetArray(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue);
-    Q_INVOKABLE QVariant Get(QString qstrnodename,QString qstrkeyname);
-    Q_INVOKABLE QVariant GetArray(QString qstrnodename,QString qstrkeyname);
+    Q_INVOKABLE void set(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue);
+    Q_INVOKABLE void setArray(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue);
+    Q_INVOKABLE QVariant get(QString qstrnodename,QString qstrkeyname);
+    Q_INVOKABLE QVariant getArray(QString qstrnodename,QString qstrkeyname);
     void Clear();
 private:
-    Config(QString qstrfilename = "");
+    explicit Config(QString qstrfilename = "");
     ~Config(void);
     Q_DISABLE_COPY_MOVE(Config)
     QString m_qstrFileName;

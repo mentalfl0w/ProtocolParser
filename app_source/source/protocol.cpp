@@ -5,20 +5,18 @@ using namespace zigbee_protocol;
 
 Protocol::Protocol(){
     _config = Config::instance();
-    if (_config->Get("Protocol","hmac_verify_key").toString().isEmpty())
-        _config->Set("Protocol","hmac_verify_key",hmac_verify_key);
+    if (_config->get("Protocol","hmac_verify_key").toString().isEmpty())
+        _config->set("Protocol","hmac_verify_key",hmac_verify_key);
     else
-        hmac_verify_key = _config->Get("Protocol","hmac_verify_key").toString();
-    if (_config->GetArray("Protocol","pre_hmac_verify_key").toStringList().isEmpty())
-        _config->SetArray("Protocol","pre_hmac_verify_key",pre_hmac_verify_key);
+        hmac_verify_key = _config->get("Protocol","hmac_verify_key").toString();
+    if (_config->getArray("Protocol","pre_hmac_verify_key").toStringList().isEmpty())
+        _config->setArray("Protocol","pre_hmac_verify_key",pre_hmac_verify_key);
     else
-        pre_hmac_verify_key = _config->GetArray("Protocol","pre_hmac_verify_key").toStringList();
+        pre_hmac_verify_key = _config->getArray("Protocol","pre_hmac_verify_key").toStringList();
 }
 
 Protocol::~Protocol()
 {
-    _config->Set("Protocol","hmac_verify_key",hmac_verify_key);
-    _config->SetArray("Protocol","pre_hmac_verify_key",pre_hmac_verify_key);
 }
 
 Protocol* Protocol::getInstance()
