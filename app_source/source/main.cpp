@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_WIN
     FramelessConfig::instance()->set(Global::Option::ForceHideWindowFrameBorder);
-    FramelessConfig::instance()->set(Global::Option::ForceNonNativeBackgroundBlur);
+    FramelessConfig::instance()->set(Global::Option::WindowUseRoundCorners);
 #endif
     FramelessConfig::instance()->set(Global::Option::EnableBlurBehindWindow);
     FramelessConfig::instance()->set(Global::Option::CenterWindowBeforeShow);

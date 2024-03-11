@@ -4,6 +4,7 @@
 #include <QQmlEngine>
 #include <QVariant>
 #include <QSettings>
+#include <QMutex>
 
 class Config : public QObject
 {
@@ -25,6 +26,7 @@ private:
     Q_DISABLE_COPY_MOVE(Config)
     QString m_qstrFileName;
     QSettings *m_psetting=nullptr;
+    QMutex _mutex;
 };
 
 #endif // CONFIG_H

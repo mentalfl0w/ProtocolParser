@@ -104,13 +104,20 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
     switch (zframe.getDesPort()) {
     case 0x81:
     {
-        hframe = (hmac_frame*)frame;
         QJsonObject object;
+        hframe = (hmac_frame*)frame;
         object.insert("text",QJsonValue(QString(zdata.toHex(' ').toUpper())));
         object.insert("sender", sender);
-        object.insert("note_text",QJsonValue("收到节点0x"+ sender +"发送的验证信息"));
         object.insert("recieved", true);
         object.insert("type","zigbee_identify_data");
+        if(*(u16*)frame != HMAC_FRAME_HEAD)
+        {
+            object.insert("note_text",QJsonValue("收到节点0x"+ sender +"发送的数据包，但并非验证信息，请检查下位机发送是否有误"));
+            emit data_send("zigbee_identify_data_view",object);
+            return;
+        }
+        else
+            object.insert("note_text",QJsonValue("收到节点0x"+ sender +"发送的验证信息"));
         emit data_send("zigbee_identify_data_view",object);
         if (_allow_list.contains(node->first.addr))
         {
@@ -238,38 +245,54 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                 zigbee_protocol::ZigbeeFrame nzframe = zframe;
                 czdata = (crypto_zdata_frame*)frame;
                 _protocol->zigbee_data_dectypt((uint8_t*)&ndata, &data_len, czdata, Crypto::SM4_decrypt);
-                memcpy(nbframe.data, &ndata, ndata.data_length + DATA_FRAME_PREFIX_LEN);
-                nbframe.length = BASE_FRAME_PREFIX_LEN + ndata.data_length + DATA_FRAME_PREFIX_LEN;
-                nzframe.setData((char*)&nbframe,nbframe.length);
-                zdata = QByteArray((char *)nzframe.data(), nzframe.size());
-                object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
-                ddata = (data_frame*)&ndata;
+                if(*(u16 *)&ndata != DATA_FRAME_HEAD)
+                {
+                    note_text = "数据包错误，请检查是否解密失败或为数据帧";
+                }
+                else
+                {
+                    memcpy(nbframe.data, &ndata, ndata.data_length + DATA_FRAME_PREFIX_LEN);
+                    nbframe.length = BASE_FRAME_PREFIX_LEN + ndata.data_length + DATA_FRAME_PREFIX_LEN;
+                    nzframe.setData((char*)&nbframe,nbframe.length);
+                    zdata = QByteArray((char *)nzframe.data(), nzframe.size());
+                    object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
+                    ddata = (data_frame*)&ndata;
+                }
+            }
+            else if (*(u16 *)frame != DATA_FRAME_HEAD)
+            {
+                object.insert("note_text",QJsonValue("收到节点0x"+sender+"发送的数据,但不是数据帧或加密帧，请检查下位机发送是否有误"));
+                emit data_send("zigbee_recv_data_view",object);
+                return;
             }
             else{
                 ddata = (data_frame*)frame;
             }
-            switch (ddata->type) {
-            case SENSOR_DATA_TYPE:
+            if(ddata!=nullptr)
             {
-                QStringList name_list, type_list;
-                name_list = Config::instance()->getArray("Protocol", "data_frame_name").toStringList();
-                type_list = Config::instance()->getArray("Protocol", "data_frame_type").toStringList();
-                if (!name_list.length())
-                    break;
-                note_text += "传感器数据：";
-                void* pdata = (void *)ddata->data;
-                for (uint8_t i = 0; i < name_list.length(); i++)
+                switch (ddata->type) {
+                case SENSOR_DATA_TYPE:
                 {
-                    note_text += name_list[i]+ ":" + sensor_data_reader(&pdata,type_list[i]) + ' ';
+                    QStringList name_list, type_list;
+                    name_list = Config::instance()->getArray("Protocol", "data_frame_name").toStringList();
+                    type_list = Config::instance()->getArray("Protocol", "data_frame_type").toStringList();
+                    if (!name_list.length())
+                        break;
+                    note_text += "传感器数据：";
+                    void* pdata = (void *)ddata->data;
+                    for (uint8_t i = 0; i < name_list.length(); i++)
+                    {
+                        note_text += name_list[i]+ ":" + sensor_data_reader(&pdata,type_list[i]) + ' ';
+                    }
+                    object.insert("note_text",QJsonValue(note_text));
+                    break;
                 }
-                object.insert("note_text",QJsonValue(note_text));
-                break;
+                default:
+                    break;
+                }
+                if (QRandomGenerator::global()->bounded(2)!=0 && is_demo)
+                    object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
             }
-            default:
-                break;
-            }
-            if (QRandomGenerator::global()->bounded(2)!=0 && is_demo)
-                object.insert("decrypted_text", QJsonValue(QString(zdata.toHex(' ').toUpper())));
             emit data_send("zigbee_recv_data_view",object);
         }
         else

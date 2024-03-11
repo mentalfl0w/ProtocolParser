@@ -37,11 +37,13 @@ Config* Config::instance()
 
 void Config::set(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue)
 {
+    QMutexLocker locker(&_mutex);
     m_psetting->setValue(QString("/%1/%2").arg(qstrnodename).arg(qstrkeyname), qvarvalue);
 }
 
 void Config::setArray(QString qstrnodename,QString qstrkeyname,QVariant qvarvalue)
 {
+    QMutexLocker locker(&_mutex);
     m_psetting->beginWriteArray(QString("/%1/%2").arg(qstrnodename).arg(qstrkeyname));
     QList<QVariant> list = qvarvalue.toList();
     for (int i = 0; i< list.length(); i++)
@@ -54,12 +56,14 @@ void Config::setArray(QString qstrnodename,QString qstrkeyname,QVariant qvarvalu
 
 QVariant Config::get(QString qstrnodename,QString qstrkeyname)
 {
+    QMutexLocker locker(&_mutex);
     QVariant qvar = m_psetting->value(QString("/%1/%2").arg(qstrnodename).arg(qstrkeyname));
     return qvar;
 }
 
 QVariant Config::getArray(QString qstrnodename,QString qstrkeyname)
 {
+    QMutexLocker locker(&_mutex);
     QList<QVariant> list;
     int size = m_psetting->beginReadArray(QString("/%1/%2").arg(qstrnodename).arg(qstrkeyname));
     for (int i = 0; i< size; i++)
@@ -73,5 +77,6 @@ QVariant Config::getArray(QString qstrnodename,QString qstrkeyname)
 
 void Config::Clear()
 {
+    QMutexLocker locker(&_mutex);
     m_psetting->clear();
 }
