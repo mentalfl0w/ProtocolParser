@@ -68,7 +68,9 @@ RibbonMessage{
         color: RibbonTheme.dark_mode ? "white" : !model.recieved ? "white" : "black"
         text: model.note_text ? model.note_text : ""
         visible: model.note_text ? true : false
-        Layout.preferredWidth: implicitWidth < message_style.component_width ? implicitWidth : message_style.component_width
+        Layout.preferredWidth: message_raw_layout.visible ? implicitWidth < (message_raw_layout.width - (message_raw_layout.padding * 2)) ?
+                                   implicitWidth : (message_raw_layout.width - (message_raw_layout.padding * 2)) : implicitWidth < component_width ?
+                                                                    implicitWidth : component_width
         wrapMode: RibbonText.Wrap
     }
 }
