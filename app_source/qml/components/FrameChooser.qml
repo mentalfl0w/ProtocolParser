@@ -125,7 +125,7 @@ Item {
                     bottomRightRadius: topRightRadius
                     implicitHeight: object_width
                     implicitWidth: object_width
-                    color: bg.selected || mouse.containsMouse ? "#506BBD" : RibbonTheme.dark_mode ? '#3A4045' : "white"
+                    color: bg.selected || mouse.containsMouse ? RibbonTheme.dark_mode ? "#8AAAEB" : "#506BBD" : RibbonTheme.dark_mode ? '#3A4045' : "white"
                     property bool selected: false
                     property bool is_focused: frame.currentIndex === index
                     onIs_focusedChanged: {
@@ -149,11 +149,11 @@ Item {
                             if(!RibbonTheme.dark_mode)
                             {
                                 if(mouse.containsMouse&&!bg.selected)
-                                    return 'black'
-                                else if(mouse.containsMouse&&bg.selected)
                                     return 'white'
-                                else if(!mouse.containsMouse&&bg.selected)
+                                else if(mouse.containsMouse&&bg.selected)
                                     return 'black'
+                                else if(!mouse.containsMouse&&bg.selected)
+                                    return 'white'
                                 else
                                     return 'black'
                             }
