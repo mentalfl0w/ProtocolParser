@@ -266,6 +266,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                     object.insert("recieved", false);
                     object.insert("type","zigbee_recv_data");
                     emit data_send("zigbee_recv_data_view",object);
+                    emit data_send("serial_port",object);
                     return;
                 }
                 else
@@ -338,6 +339,8 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("recieved", false);
             object.insert("type","zigbee_recv_data");
             emit data_send("zigbee_recv_data_view",object);
+            if(!is_demo)
+                emit data_send("serial_port",object);
         }
         break;
     }
