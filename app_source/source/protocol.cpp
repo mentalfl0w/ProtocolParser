@@ -166,6 +166,7 @@ void Protocol::zigbee_data_encrypt(uint8_t *data, uint8_t data_len, crypto_zdata
     QByteArray key = QByteArray::fromHex(en_key == "" ? hmac_verify_key.toLatin1() : en_key.toLatin1());
     SM4_encrypt((u8 *)key.data(), 16, data, data_len, zdata->data,&len,false);
     zdata->length = len + CRYPTO_ZDATA_FRAME_PREFIX_LEN;
+    zdata->crc = crc16_xmodem(data, data_len);
 }
 
 bool Protocol::zigbee_data_dectypt(uint8_t *data, uint8_t *data_len, crypto_zdata_frame *zdata,
@@ -179,6 +180,9 @@ bool Protocol::zigbee_data_dectypt(uint8_t *data, uint8_t *data_len, crypto_zdat
     QByteArray key = QByteArray::fromHex(en_key == "" ? hmac_verify_key.toLatin1() : en_key.toLatin1());
     SM4_decrypt((u8 *)key.data(), 16, zdata->data, msglen, data, &len,false);
     *data_len = len;
+    u16 crc = crc16_xmodem(data, *data_len);
+    if (crc != zdata->crc)
+        return false;
     return true;
 }
 

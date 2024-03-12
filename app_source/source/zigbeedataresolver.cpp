@@ -251,6 +251,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
                     object.insert("note_text",QJsonValue(note_text));
                     emit data_send("zigbee_recv_data_view",object);
                     node->second.id=0;
+                    node->second.verified=0;
                     new_data_frame(5) dframe;
                     memset(&dframe,0,sizeof (dframe));
                     _protocol->protocal_wrapper((data_frame *)&dframe, 0, 5, (u8 *)"RESET", false);
@@ -324,6 +325,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
             object.insert("type","zigbee_recv_data");
             emit data_send("zigbee_recv_data_view",object);
             node->second.id=0;
+            node->second.verified=0;
             new_data_frame(5) dframe;
             memset(&dframe,0,sizeof (dframe));
             _protocol->protocal_wrapper((data_frame *)&dframe, 0, 5, (u8 *)"RESET", false);

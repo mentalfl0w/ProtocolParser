@@ -121,6 +121,7 @@ typedef struct crypto_zdata_frame
 {
     u16 head;
     u16 length;
+    u16 crc;
     u8 data[100];
 }crypto_zdata_frame;
 
