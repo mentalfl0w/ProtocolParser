@@ -125,7 +125,7 @@ typedef struct crypto_zdata_frame
     u8 data[100];
 }crypto_zdata_frame;
 
-#define CRYPTO_ZDATA_FRAME_PREFIX_LEN sizeof(u16)*2
+#define CRYPTO_ZDATA_FRAME_PREFIX_LEN sizeof(u16)*3
 #define new_crypto_zdata_frame(num) \
     struct 							\
 {										\
