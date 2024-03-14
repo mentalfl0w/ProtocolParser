@@ -98,7 +98,7 @@ void ZigBeeDataResolver::des_port_parser(zigbee_protocol::ZigbeeFrame &zframe, b
         object.insert("recieved", true);
         object.insert("sender", sender);
         object.insert("type","zigbee_recv_data");
-        emit data_send("zigbee_recv_data",object);
+        emit data_send("zigbee_recv_data_view",object);
         return;
     }
     switch (zframe.getDesPort()) {
