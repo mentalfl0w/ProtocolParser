@@ -173,10 +173,11 @@ sequenceDiagram
 |:----:|:----:|:----:|
 | head | 2 | 包头，数值固定为`0xAAAF` |
 | length | 2 | 长度，包括包头 |
-| data | 可变长度 | 数据最大不超过（8191 - `BASE_FRAME_PREFIX_LEN` - `CRYPTO_ZDATA_FRAME_PREFIX_LEN`）= 8173 |
+| crc | 2 | CRC16校验码,对解密数据进行CRC校验后数值与该码不同，将被判定为解密失败 |
+| data | 可变长度 | 数据最大不超过（8191 - `BASE_FRAME_PREFIX_LEN` - `CRYPTO_ZDATA_FRAME_PREFIX_LEN`）= 8171 |
 
 另有其他说明如下：
-+ 宏定义`CRYPTO_ZDATA_FRAME_PREFIX_LEN`：对称加密数据帧帧头长度，固定为4Bytes
++ 宏定义`CRYPTO_ZDATA_FRAME_PREFIX_LEN`：对称加密数据帧帧头长度，固定为6Bytes
 + 宏定义`CRYPTO_ZDATA_FRAME_HEAD`：对称加密数据帧帧头，固定为`0xAAAF`
 ### 4.7 设备信息存储（device）
 协议采用`device`结构体用作存储相关通讯数据。
