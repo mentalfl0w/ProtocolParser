@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(ProtocolParser_APP VERSION 1.0.2 LANGUAGES CXX)
+project(ProtocolParser_APP VERSION 1.0.3 LANGUAGES CXX)
 
 set(RIBBONUI_BUILD_FRAMELESSHEPLER ON)
 set(RIBBONUI_BUILD_EXAMPLES OFF)
