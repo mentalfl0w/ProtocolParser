@@ -188,7 +188,28 @@ Item{
                                                                                              : serial_send_type_combo.currentText === "回车" ? SerialPortManager.WithCarriageEnter
                                                                                                                                            : serial_send_type_combo.currentText === "换行" ? SerialPortManager.WithLineFeed
                                                                                                                                                                                          : SerialPortManager.WithCarriageEnterAndLineFeed
-                    SerialPortManager.write(message_sender_textbox.text)
+                    let data = input_validate(message_sender_textbox.text)
+                    switch(data)
+                    {
+                    case 'empty':
+                        message_sender_textbox.text = "待发送内容为空！"
+                        return
+                    case 'hex':
+                        message_sender_textbox.text = "请严格按照16进制输入！"
+                        return
+                    case 'case':
+                        message_sender_textbox.text = "请使用全大写或全小写16进制输入！"
+                        return
+                    case 'blank':
+                        message_sender_textbox.text = "首尾部不可出现空格！"
+                        return
+                    case 'separate':
+                        message_sender_textbox.text = "字节间需用空格分隔！"
+                        return
+                    default:
+                        break
+                    }
+                    SerialPortManager.write(data)
                     serial_view.message_model.append({
                                                          time: Qt.formatDateTime(new Date(), "yyyy-MM-dd hh:mm:ss.zzz"),
                                                          note_text: message_sender_textbox.text,
@@ -196,8 +217,27 @@ Item{
                                                      })
                     message_sender_textbox.textedit.clear()
                 }
-
                 enabled: SerialPortManager.opened
+                function input_validate(str)
+                {
+                    if (str.length === 0 && serial_send_type_combo.currentText === "无")
+                        return 'empty';
+                    if (!/^[0-9a-z ]+$/i.test(str) && SerialPortManager.send_hex) {
+                        return 'hex';
+                    }
+                    if ((!(str === str.toUpperCase() || str === str.toLowerCase())) && SerialPortManager.send_hex) {
+                        return 'case';
+                    }
+                    if ((str.startsWith(' ') || str.endsWith(' ')) && SerialPortManager.send_hex) {
+                        return 'blank';
+                    }
+                    for (let i = 0; (i < str.length - 1) && SerialPortManager.send_hex; i += 3) {
+                        if (str[i + 2] !== ' ' && i !== str.length - 2) {
+                            return 'separate';
+                        }
+                    }
+                    return str;
+                }
             }
         }
     }

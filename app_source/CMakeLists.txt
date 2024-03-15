@@ -26,7 +26,7 @@ set(PROJECT_BUNDLE_NAME ${PROJECT_NAME})
 set(version_str "${CMAKE_PROJECT_VERSION_MAJOR},${CMAKE_PROJECT_VERSION_MINOR},${CMAKE_PROJECT_VERSION_PATCH}")
 add_definitions(-DPROTOCOLPARSER_VERSION=${version_str})
 
-find_package(Qt6 COMPONENTS Quick SerialPort LinguistTools REQUIRED)
+find_package(Qt6 COMPONENTS Quick SerialPort LinguistTools WebView REQUIRED)
 
 set(
     sources_files source/main.cpp include/serialportmanager.h source/serialportmanager.cpp include/eventsbus.h source/eventsbus.cpp
@@ -37,6 +37,7 @@ set(
     include/serialdataresolver.h source/serialdataresolver.cpp
     include/zigbeedataresolver.h source/zigbeedataresolver.cpp
     include/eventbusresolver.h source/eventbusresolver.cpp
+    include/tools.h source/tools.cpp
     languages/zh_CN.ts languages/en_US.ts
 )
 
@@ -46,7 +47,18 @@ set(
     qml/components/ZigBeeMessage.qml qml/components/SerialPortAssistant.qml
     qml/components/ZigBeeDataView.qml qml/components/TabBar.qml qml/components/CenterView.qml
     qml/components/ListTable.qml qml/components/DeviceList.qml qml/components/KeysList.qml
-    qml/components/EventsHistoryList.qml qml/components/FrameChooser.qml
+    qml/components/EventsHistoryList.qml qml/components/FrameChooser.qml qml/components/RibbonMarkDownViewer.qml
+    qml/components/HelpView.qml
+)
+
+set(js_files js/markdown-it.js js/markdown-it-deflist.js js/markdown-it-emoji.js
+    js/markdown-it-sub.js js/markdown-it-abbr.js js/markdown-it-container.js js/markdown-it-footnote.js
+    js/markdown-it-ins.js js/markdown-it-mark.js js/markdown-it-sup.js js/prism.js
+)
+
+set(doc_files ${CMAKE_SOURCE_DIR}/documents/menu.md ${CMAKE_SOURCE_DIR}/documents/protocol.md
+    ${CMAKE_SOURCE_DIR}/documents/serialport.md ${CMAKE_SOURCE_DIR}/documents/zigbee.md
+    ${CMAKE_SOURCE_DIR}/documents/others.md
 )
 
 INCLUDE_DIRECTORIES(dlln3x include)
@@ -97,10 +109,21 @@ foreach(qmlfile ${qml_files})
     set_source_files_properties(${qmlfile} PROPERTIES QT_RESOURCE_ALIAS ${fixedfile})
 endforeach(qmlfile)
 
+foreach(jsfile ${js_files})
+    string(REPLACE "js/" "" fixedfile ${jsfile})
+    set_source_files_properties(${jsfile} PROPERTIES QT_RESOURCE_ALIAS ${fixedfile})
+endforeach(jsfile)
+
+foreach(docfile ${doc_files})
+    string(REPLACE "${CMAKE_SOURCE_DIR}/" "" fixedfile ${docfile})
+    set_source_files_properties(${docfile} PROPERTIES QT_RESOURCE_ALIAS ${fixedfile})
+endforeach(docfile)
+
 qt_add_qml_module(${PROJECT_NAME}
     URI ${PROJECT_NAME}
     QML_FILES ${qml_files}
     RESOURCE_PREFIX "/qt/qml/"
+    RESOURCES ${js_files} ${doc_files} resources/theme.css resources/default.css resources/prism-light.css resources/prism-dark.css
     VERSION ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}
 )
 
@@ -125,6 +148,7 @@ if(RIBBONUI_BUILD_STATIC_LIB)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt::Quick
         Qt::SerialPort
+        Qt::WebView
         RibbonUIplugin
         sm_crypto
         FramelessHelper::Core
@@ -135,6 +159,7 @@ else()
     target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt::Quick
         Qt::SerialPort
+        Qt::WebView
         RibbonUI
         sm_crypto
         FramelessHelper::Core

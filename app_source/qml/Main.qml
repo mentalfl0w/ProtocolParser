@@ -15,6 +15,25 @@ RibbonWindow {
     minimumHeight: 800
     title: qsTr("Protocol Parser") + ` V${PPAPP_Version}`
 
+    title_bar.right_content:RowLayout{
+        spacing: 1
+        layoutDirection: Qt.RightToLeft
+        RibbonButton{
+            show_bg:false
+            icon_source: RibbonIcons.QuestionCircle
+            icon_source_filled: RibbonIcons_Filled.QuestionCircle
+            tip_text: qsTr("帮助")
+            hover_color: Qt.rgba(0,0,0, 0.3)
+            pressed_color: Qt.rgba(0,0,0, 0.4)
+            text_color: title_bar.title_text_color
+            text_color_reverse: false
+            onClicked: {
+                show_popup("components/HelpView.qml")
+            }
+        }
+
+    }
+
     TabBar{
         id: tab_bar
         center_view: center_view

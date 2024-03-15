@@ -5,6 +5,7 @@
 #include <FramelessHelper/Core/private/framelessconfig_p.h>
 #include <QTranslator>
 #include <QQmlContext>
+#include <QtWebView>
 
 FRAMELESSHELPER_USE_NAMESPACE
 #ifdef RIBBONUI_BUILD_STATIC_LIB
@@ -13,6 +14,7 @@ Q_IMPORT_QML_PLUGIN(RibbonUIPlugin)
 int main(int argc, char *argv[])
 {
     qputenv("QT_QUICK_CONTROLS_STYLE","Basic");
+    QtWebView::initialize();
     FramelessHelper::Quick::initialize();
     QGuiApplication app(argc, argv);
 
