@@ -46,7 +46,7 @@ jobs:
         with:
           version: ${{ matrix.qt_ver }}
           arch: ${{ matrix.qt_arch }}
-          modules: 'qt5compat qtmultimedia qtshadertools qtimageformats qtserialport qtwebview qtwebengine'
+          modules: 'qt5compat qtmultimedia qtshadertools qtimageformats qtserialport qtwebview qtwebengine qtwebchannel qtpositioning'
           
       - name: msvc-build
         id: build
