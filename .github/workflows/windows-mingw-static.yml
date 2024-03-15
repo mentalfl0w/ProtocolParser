@@ -43,7 +43,7 @@ jobs:
         with:
           version: ${{ matrix.qt_ver }}
           arch: ${{ matrix.qt_arch }}
-          modules: 'qt5compat qtmultimedia qtshadertools qtimageformats qtserialport qtwebview'
+          modules: 'qt5compat qtmultimedia qtshadertools qtimageformats qtserialport qtwebview qtwebengine'
       
       - name: Qt6 environment configuration
         if: ${{ startsWith( matrix.qt_ver, 6 ) }}
