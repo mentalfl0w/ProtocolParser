@@ -125,6 +125,27 @@
   vertical-align: text-bottom;
 }
 
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+  height:100%;
+}
+
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+
+  .markdown-source{
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+}
+
 .markdown-body h1:hover .anchor .octicon-link:before,
 .markdown-body h2:hover .anchor .octicon-link:before,
 .markdown-body h3:hover .anchor .octicon-link:before,

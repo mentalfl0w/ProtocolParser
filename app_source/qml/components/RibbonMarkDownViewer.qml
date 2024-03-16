@@ -15,13 +15,15 @@ import "qrc:/qt/qml/ProtocolParser/markdown-it-mark.js" as MarkdownItMark
 
 Item {
     id:root
-    property string text: ""
+    property string file_name: ""
     property string base_url: ""
+    property string current_path: ""
+    property string resource_dir: ""
     property int page_height: 0
     property alias can_goback: viewer.canGoBack
     property alias can_goforward: viewer.canGoForward
 
-    onTextChanged: reload()
+    onFile_nameChanged: reload()
 
     WebView{
         id: viewer
@@ -32,6 +34,9 @@ Item {
         }
         width: parent.width
         height: parent.height
+        settings.allowFileAccess: true
+        settings.localStorageEnabled: true
+        settings.javaScriptEnabled: true
         property int pre_height: 0
         onLoadingChanged: function(request){
             if (request.status === WebView.LoadStartedStatus)
@@ -43,10 +48,8 @@ Item {
                 }
                 else if (request.url.toString().match(/^qrc?:\/.+/))
                 {
-                    console.log(request.url)
-                    text = Tools.readAll(request.url.toString().replace("qrc:/",":/"))
                     pre_height = 0
-                    load()
+                    load(request.url.toString())
                 }
             }
             else if (request.status === WebView.LoadSucceededStatus)
@@ -63,7 +66,7 @@ Item {
 
 
     Component.onCompleted: {
-        load()
+        load(file_name)
     }
 
     Connections{
@@ -90,56 +93,123 @@ Item {
     {
         viewer.runJavaScript("document.body.scrollTop", function(height) {
             viewer.pre_height = height
-            load()
+            load(current_path)
         });
     }
 
-    function load()
+    function load(file_path)
     {
-        var style = Tools.readAll(":/qt/qml/ProtocolParser/resources/theme.css")
-        var prism = Tools.readAll(`:/qt/qml/ProtocolParser/resources/prism-${RibbonTheme.dark_mode ? 'dark' : 'light'}.css`)
-        var prismjs = Tools.readAll(":/qt/qml/ProtocolParser/prism.js")
-        var ex = `
-        html {
-        height:100%;
-        overflow:hidden;
-        position:relative;
+        if(!file_path)
+        {
+            viewer.url = "about:blank"
+            return
         }
-        .markdown-body {
-        box-sizing: border-box;
-        min-width: 200px;
-        max-width: 980px;
-        margin: 0 auto;
-        padding: 45px;
-        height:100%;
-        overflow:auto;
-        position:relative;
-        }
+        current_path = file_path
+        let text = Tools.readAll(file_path)
+        var script = `
+            var md;
+            let base_url = '${base_url}';
+            var defaults = {
+              html: true,
+              xhtmlOut: false,
+              breaks: false,
+              linkify: true,
+              typographer: true,
+            };
+            mermaid.initialize({
+                startOnLoad:true,
+                darkMode:${RibbonTheme.dark_mode},
+                theme: "${RibbonTheme.dark_mode ? 'dark' : 'neutral'}",
+                htmlLabels:true
+            });
+            const mermaidChart = (code) => {
+                console.log(code)
+                try {
+                    return \`<div class=\"mermaid\">\${code}</div>\`
+                } catch ({ str, hash }) {
+                    return \`<pre>\${str}</pre>\`
+                }
+            }
+            defaults.highlight = function (str, lang) {
+                var esc = md.utils.escapeHtml;
+                if (lang && hljs.getLanguage(lang)) {
+                    try {
+                        return '<pre class="hljs"><code>' +
+                         hljs.highlight(lang, str, true).value +
+                         '</code></pre>';
+                    } catch (__) {}
+                }else if(lang == 'mermaid'){
+                    return mermaidChart(str)
+                }else{
+                    return '<pre class="hljs"><code>' + esc(str) + '</code></pre>';
+                }
+            };
+            md = window.markdownit(defaults);
+            md.use(markdownitDeflist);
+            md.use(markdownitEmoji);
+            md.use(markdownitSub);
+            md.use(markdownitSup);
+            md.use(markdownitAbbr);
+            md.use(markdownitContainer);
+            md.use(markdownitFootnote);
+            md.use(markdownitIns);
+            md.use(markdownitMark);
 
-        @media (max-width: 767px) {
-        .markdown-body {
-        padding: 15px;
-        }
-        }`
-        var md = markdownit({
-                                html: true,
-                                linkify: true,
-                                typographer: true
-                            });
-        md.use(markdownitDeflist)
-        md.use(markdownitEmoji)
-        md.use(markdownitSub)
-        md.use(markdownitSup)
-        md.use(markdownitAbbr)
-        md.use(markdownitContainer)
-        md.use(markdownitFootnote)
-        md.use(markdownitIns)
-        md.use(markdownitMark)
-        var result = md.render(text);
-        result = result.replace(new RegExp("href=\"(./)?", "gi"), 'href="'+base_url);
-        viewer.loadHtml(`<html data-theme=${RibbonTheme.dark_mode ? 'dark' : 'light'}>` + '<head><meta charset="UTF-8", name="viewport" content="width=device-width, initial-scale=1">' +
-                                                                    "<style>" + ex + prism + style + "</style></head>" + "<body>" + '<script>' + prismjs + '</script>' +
-                                                                    '<article class="markdown-body">' + result + '</article>' + "</body></html>")
+            let result = md.render($('.markdown-source').html());
+            if (base_url.match(/^qrc?:\\/.+/g))
+                result = result.replace(/href="(\\.\\/)?(.*?).md"/g, 'href="${base_url}/$2.md"');
+            result = result.replace(/src=\\"(\\.\\/)?/g, \`src=\"${resource_dir}\`);
+            $('.markdown-body').html(result);
+            $('.markdown-source').remove();
+        `
+        // var md = markdownit({
+        //                         html: true,
+        //                         linkify: true,
+        //                         typographer: true
+        //                     });
+        // md.use(markdownitDeflist)
+        // md.use(markdownitEmoji)
+        // md.use(markdownitSub)
+        // md.use(markdownitSup)
+        // md.use(markdownitAbbr)
+        // md.use(markdownitContainer)
+        // md.use(markdownitFootnote)
+        // md.use(markdownitIns)
+        // md.use(markdownitMark)
+        // var result = md.render(text);
+        // if (base_url.match(/^qrc?:\/.+/))
+        //     result = result.replace(new RegExp("href=\"(\.\/)?(.*?).md", "gi"), `href="${base_url}/$2.md"`);
+        // result = result.replace(new RegExp("src=\"(./)?", "gi"), `src="`+resource_dir);
+        let parts = file_path.split('/')
+        let full_file_name = parts[parts.length-1] === '/' ? parts[parts.length-2] : parts[parts.length-1]
+        let file_name = full_file_name.split('.')
+        let html_name = `${file_name[0]}.html`
+        let prefix = `file:${Qt.platform.os === 'windows' ? '///' : '//'}` + Tools.baseDir
+        let html = `<!DOCTYPE html><html data-theme=${RibbonTheme.dark_mode ? 'dark' : 'light'}>` +
+                                                               '<head><meta charset="UTF-8", name="viewport" content="width=device-width, initial-scale=1">' +
+                                                               `<title>${full_file_name}</title>` +
+                                                               `<link rel="stylesheet" href=${prefix}resources/theme.css></style>` +
+                                                               `<link rel="stylesheet" href=${prefix}resources/github-${RibbonTheme.dark_mode ? 'dark' : 'light'}.css></style>` +
+                                                               `<script src=${prefix}jquery.js></script>` +
+                                                               `<script src=${prefix}markdown-it.js></script>`+
+                                                               `<script src=${prefix}markdown-it-deflist.js></script>` +
+                                                               `<script src=${prefix}markdown-it-emoji.js></script>` +
+                                                               `<script src=${prefix}markdown-it-sub.js></script>` +
+                                                               `<script src=${prefix}markdown-it-abbr.js></script>` +
+                                                               `<script src=${prefix}markdown-it-container.js></script>` +
+                                                               `<script src=${prefix}markdown-it-footnote.js></script>` +
+                                                               `<script src=${prefix}markdown-it-ins.js></script>` +
+                                                               `<script src=${prefix}markdown-it-mark.js></script>` +
+                                                               `<script src=${prefix}markdown-it-sup.js></script>` +
+                                                               `<script src=${prefix}highlight.js></script>` +
+                                                               `<script src=${prefix}mermaid.js></script>`+
+                                                               "</head>" + "<body>" +
+                                                               '<article class="markdown-body">' + '</article>' +
+                                                               '<pre class="markdown-source">' + text + '</pre>' +
+                                                               `<script type="module">${script}</script>` +
+                                                               "</body></html>"
+        Tools.writeFiletoDir(html,Tools.baseDir,html_name)
+        viewer.url = (prefix + html_name)
     }
 
     function go_back()

@@ -4,6 +4,7 @@ project(ProtocolParser VERSION ${CMAKE_PROJECT_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
 if(QT_VERSION VERSION_GREATER_EQUAL "6.3")
     qt_standard_project_setup()
     qt_policy(SET QTP0001 NEW)
@@ -53,12 +54,14 @@ set(
 
 set(js_files js/markdown-it.js js/markdown-it-deflist.js js/markdown-it-emoji.js
     js/markdown-it-sub.js js/markdown-it-abbr.js js/markdown-it-container.js js/markdown-it-footnote.js
-    js/markdown-it-ins.js js/markdown-it-mark.js js/markdown-it-sup.js js/prism.js
+    js/markdown-it-ins.js js/markdown-it-mark.js js/markdown-it-sup.js
+    js/jquery.js js/mermaid.js_packaged js/highlight.js
 )
 
-set(doc_files ${CMAKE_SOURCE_DIR}/documents/menu.md ${CMAKE_SOURCE_DIR}/documents/protocol.md
+set(doc_files ${CMAKE_SOURCE_DIR}/README.md ${CMAKE_SOURCE_DIR}/documents/protocol.md
     ${CMAKE_SOURCE_DIR}/documents/serialport.md ${CMAKE_SOURCE_DIR}/documents/zigbee.md
-    ${CMAKE_SOURCE_DIR}/documents/others.md
+    ${CMAKE_SOURCE_DIR}/documents/others.md ${CMAKE_SOURCE_DIR}/documents/pictures/home-dark.png
+    ${CMAKE_SOURCE_DIR}/documents/pictures/home-light.png ${CMAKE_SOURCE_DIR}/app_source/resources/imgs/icon.png
 )
 
 INCLUDE_DIRECTORIES(dlln3x include)
@@ -123,7 +126,7 @@ qt_add_qml_module(${PROJECT_NAME}
     URI ${PROJECT_NAME}
     QML_FILES ${qml_files}
     RESOURCE_PREFIX "/qt/qml/"
-    RESOURCES ${js_files} ${doc_files} resources/theme.css resources/default.css resources/prism-light.css resources/prism-dark.css
+    RESOURCES ${js_files} ${doc_files} resources/theme.css resources/default.css resources/github-light.css resources/github-dark.css
     VERSION ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}
 )
 

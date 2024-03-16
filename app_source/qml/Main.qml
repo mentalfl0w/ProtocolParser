@@ -56,7 +56,7 @@ RibbonWindow {
         anchors{
             left: parent.left
             right: parent.right
-            bottom: parent.bottom
+            bottom: center_view.bottom
         }
     }
 

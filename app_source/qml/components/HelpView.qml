@@ -7,9 +7,10 @@ import "."
 
 Item {
     id:root
-    implicitHeight: 500
-    implicitWidth: 500
+    implicitHeight: 550
+    implicitWidth: 550
     property string title: qsTr("帮助")
+    Component.onCompleted: Tools.writeDirtoTempDir(":/qt/qml/ProtocolParser/")
 
     RibbonButton{
         anchors{
@@ -35,8 +36,9 @@ Item {
     RibbonMarkDownViewer{
         id: viewer
         anchors.fill: parent
-        text: Tools.readAll(':/qt/qml/ProtocolParser/documents/menu.md')
-        base_url: 'qrc:/qt/qml/ProtocolParser/documents/'
+        file_name: 'qrc:/qt/qml/ProtocolParser/README.md'
+        base_url: 'qrc:/qt/qml/ProtocolParser/'
+        resource_dir: Tools.baseDir
     }
 
     RibbonButton{

@@ -5,7 +5,7 @@
 <h1 align="center"> ProtocolParser 协议解析器 V1.0.4</h1>
 
 ## 一、介绍
-这是一个用于与DKY的THM3682实验箱搭配使用的上位机协议解析器，具体如何使用请看[使用说明](#二使用说明)。
+这是一个用于与DKY的THM3682实验箱搭配使用的上位机协议解析器，具体如何使用请看[使用说明](#使用说明)。
 <div align="center">
     <div align="center">
         <img src="documents/pictures/home-light.png" alt="主界面（浅色）" style="width:45%; height:auto;">
@@ -14,7 +14,7 @@
     <p align="center"> 主界面（浅色/深色模式） </p>
 </div>
 
-## 二、使用说明
+## <div id = "使用说明">二、使用说明<div>
 ## 1. [协议解析](documents/protocol.md)
 + 概述
 + 密钥

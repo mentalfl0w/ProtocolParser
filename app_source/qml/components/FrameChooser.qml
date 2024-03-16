@@ -185,7 +185,7 @@ Item {
                         }
                     }
                     RibbonToolTip{
-                        text: qsTr('类型：')+ qsTr(`${bg.type}, `) + qsTr('长度：') + `${bg.data_size}B`
+                        text: qsTr('类型：')+ `${bg.type}, ` + qsTr('长度：') + `${bg.data_size}B`
                         visible: text && mouse.containsMouse
                     }
 

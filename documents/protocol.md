@@ -11,10 +11,10 @@
 由于SM2算法会占用一部分资源，非对称双向认证一般用于性能较好的终端（如性能较强的单片机、树莓派或者PC等设备）之间的认证，性能较差的单片机将会出现死机等预料外情况（板载硬件密码算法模块除外）。
 ```mermaid
 sequenceDiagram
- participant 服务器
- participant 客户端
+  participant 服务器
+  participant 客户端
   客户端-->服务器: 客户端验证服务器
- 客户端->>服务器: 包含‘Hello’信息的ssl_frame请求
+  客户端->>服务器: 包含‘Hello’信息的ssl_frame请求
   服务器->>客户端: 包含‘Hello’和64Bytes服务器公钥信息的ssl_frame响应
   客户端-->>客户端: 用服务器公钥加密自己的公钥
   客户端->>服务器: 包含服务器公钥加密的客户端公钥信息的ssl_frame数据包
@@ -35,10 +35,10 @@ sequenceDiagram
 对称双向认证使用基于SM3的HMAC算法实现。通过验证双方是否共同持有同一对预设定密钥来实现认证，在实际运用过程中，为节省资源，服务器发送给客户端的‘Identified’信息可不加密，采用明文传输（因为后续传输的数据包均为加密数据包）。
 ```mermaid
 sequenceDiagram
- participant 服务器
- participant 客户端
+  participant 服务器
+  participant 客户端
   客户端-->>客户端: 生成1Byte随机数，并对其使用基于SM3的HMAC算法和<br>预设定16Bytes密钥生成值
- 客户端->>服务器: 包含随机数和使用预设定16Bytes密钥生成的<br>HMAC值信息的hmac_frame请求
+  客户端->>服务器: 包含随机数和使用预设定16Bytes密钥生成的<br>HMAC值信息的hmac_frame请求
   服务器-->>服务器: 使用自己拥有的预设定16Bytes密钥对收到的<br>1Byte随机数进行HMAC运算，并将值与收到值进行比对
   服务器->>客户端: 包含使用预设定16Bytes密钥加密的<br>‘Identified’信息的crypto_zdata_frame数据包
   客户端-->>客户端: 用预设定16Bytes密钥解密出‘Identified’信息
