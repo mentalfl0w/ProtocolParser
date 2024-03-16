@@ -22,7 +22,9 @@ public:
     Q_INVOKABLE QString fileSuffix(const QString &filePath);
     Q_INVOKABLE QString fileDir(const QString &filePath);
     Q_INVOKABLE void writeDirtoTempDir(QString path);
-    Q_INVOKABLE void writeFiletoDir(QString content, QString path, QString name);
+    Q_INVOKABLE void writeFiletoDir(QString content, QString path, QString name, QByteArray tcodec = "UTF-8");
+    Q_INVOKABLE QString GetCorrectUnicode(const QByteArray &ba);
+    Q_INVOKABLE QString GetCorrectUnicode(const QString &ba);
 
 private:
     explicit Tools(QObject *parent = nullptr);

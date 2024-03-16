@@ -111,7 +111,7 @@ Item {
             let base_url = '${base_url}';
             var defaults = {
               html: true,
-              xhtmlOut: false,
+              xhtmlOut: true,
               breaks: false,
               linkify: true,
               typographer: true,
@@ -185,8 +185,8 @@ Item {
         let file_name = full_file_name.split('.')
         let html_name = `${file_name[0]}.html`
         let prefix = `file:${Qt.platform.os === 'windows' ? '///' : '//'}` + Tools.baseDir
-        let html = `<!DOCTYPE html><html data-theme=${RibbonTheme.dark_mode ? 'dark' : 'light'}>` +
-                                                               '<head><meta charset="UTF-8", name="viewport" content="width=device-width, initial-scale=1">' +
+        let html = `<!DOCTYPE html><html data-theme=${RibbonTheme.dark_mode ? 'dark' : 'light'} xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN" lang="zh-CN">` +
+                                                               `<head><meta charset="UTF-8", name="viewport" content="width=device-width, initial-scale=1">` +
                                                                `<title>${full_file_name}</title>` +
                                                                `<link rel="stylesheet" href=${prefix}resources/theme.css></style>` +
                                                                `<link rel="stylesheet" href=${prefix}resources/github-${RibbonTheme.dark_mode ? 'dark' : 'light'}.css></style>` +

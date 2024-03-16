@@ -27,7 +27,7 @@ set(PROJECT_BUNDLE_NAME ${PROJECT_NAME})
 set(version_str "${CMAKE_PROJECT_VERSION_MAJOR},${CMAKE_PROJECT_VERSION_MINOR},${CMAKE_PROJECT_VERSION_PATCH}")
 add_definitions(-DPROTOCOLPARSER_VERSION=${version_str})
 
-find_package(Qt6 COMPONENTS Quick SerialPort LinguistTools WebView REQUIRED)
+find_package(Qt6 COMPONENTS Quick SerialPort LinguistTools WebView Core5Compat REQUIRED)
 
 set(
     sources_files source/main.cpp include/serialportmanager.h source/serialportmanager.cpp include/eventsbus.h source/eventsbus.cpp
@@ -152,6 +152,7 @@ if(RIBBONUI_BUILD_STATIC_LIB)
         Qt::Quick
         Qt::SerialPort
         Qt::WebView
+        Qt::Core5Compat
         RibbonUIplugin
         sm_crypto
         FramelessHelper::Core
@@ -163,6 +164,7 @@ else()
         Qt::Quick
         Qt::SerialPort
         Qt::WebView
+        Qt::Core5Compat
         RibbonUI
         sm_crypto
         FramelessHelper::Core
