@@ -47,7 +47,7 @@ RibbonView{
                 duration: animation_time
             }
         }
-        ScrollBar.vertical: ScrollBar {
+        ScrollBar.vertical: RibbonScrollBar {
             anchors.right: message_list.right
             anchors.rightMargin: 2
         }

@@ -138,7 +138,7 @@ Item {
             NumberAnimation { properties: "y"; from: list_table.height; duration: 200 }
         }
 
-        ScrollBar.vertical: ScrollBar {
+        ScrollBar.vertical: RibbonScrollBar {
             anchors.right: list_table.right
             anchors.rightMargin: 2
         }
