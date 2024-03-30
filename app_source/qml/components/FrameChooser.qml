@@ -70,7 +70,7 @@ Item {
         show_bg: false
         show_hovered_bg: false
         icon_source: RibbonIcons.Dismiss
-        onClicked: window_popup.close()
+        onClicked: popup.close()
     }
 
     ColumnLayout{

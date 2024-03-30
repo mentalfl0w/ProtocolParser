@@ -242,7 +242,7 @@ RibbonTabBar {
                     text: qsTr("等待队列")
                     show_tooltip: false
                     onClicked: {
-                        show_popup("components/DeviceList.qml",{list_type:0})
+                        show_popup("qrc:/qt/qml/ProtocolParser/components/DeviceList.qml",{list_type:0})
                     }
                 }
                 RibbonButton{
@@ -251,7 +251,7 @@ RibbonTabBar {
                     text: qsTr("认证列表")
                     show_tooltip: false
                     onClicked: {
-                        show_popup("components/DeviceList.qml",{list_type:1})
+                        show_popup("qrc:/qt/qml/ProtocolParser/components/DeviceList.qml",{list_type:1})
                     }
                 }
                 RibbonButton{
@@ -260,7 +260,7 @@ RibbonTabBar {
                     text: qsTr("黑名单列表")
                     show_tooltip: false
                     onClicked: {
-                        show_popup("components/DeviceList.qml",{list_type:2})
+                        show_popup("qrc:/qt/qml/ProtocolParser/components/DeviceList.qml",{list_type:2})
                     }
                 }
             }
@@ -321,7 +321,7 @@ RibbonTabBar {
                     text: qsTr("历史密钥列表")
                     show_tooltip: false
                     onClicked: {
-                        show_popup("components/KeysList.qml")
+                        show_popup("qrc:/qt/qml/ProtocolParser/components/KeysList.qml")
                     }
                 }
                 function key_format_validate(str) {
@@ -393,7 +393,7 @@ RibbonTabBar {
                         text: qsTr("事件历史信息")
                         tip_text: qsTr("查看所有事件历史信息（包含调试信息）")
                         onClicked: {
-                            show_popup("components/EventsHistoryList.qml")
+                            show_popup("qrc:/qt/qml/ProtocolParser/components/EventsHistoryList.qml")
                         }
                     }
                 }
@@ -474,7 +474,7 @@ RibbonTabBar {
                         text: qsTr("自定义数据帧")
                         tip_text: qsTr("自定义传感器数据帧结构")
                         onClicked: {
-                            show_popup("components/FrameChooser.qml")
+                            show_popup("qrc:/qt/qml/ProtocolParser/components/FrameChooser.qml")
                         }
                     }
                 }

@@ -43,7 +43,7 @@ set(
 )
 
 set(
-    qml_files qml/Main.qml qml/components/RibbonWindow.qml qml/components/ZigBeeFrame.qml
+    qml_files qml/Main.qml qml/components/ZigBeeFrame.qml
     qml/components/RibbonMessageListView.qml qml/components/RibbonMessage.qml
     qml/components/ZigBeeMessage.qml qml/components/SerialPortAssistant.qml
     qml/components/ZigBeeDataView.qml qml/components/TabBar.qml qml/components/CenterView.qml
@@ -147,31 +147,25 @@ qt_add_translations(${PROJECT_NAME}
 )
 
 if(RIBBONUI_BUILD_STATIC_LIB)
-    add_definitions(-DRIBBONUI_BUILD_STATIC_LIB)
     target_link_libraries(${PROJECT_NAME} PRIVATE
-        Qt::Quick
-        Qt::SerialPort
-        Qt::WebView
-        Qt::Core5Compat
         RibbonUIplugin
-        sm_crypto
-        FramelessHelper::Core
-        FramelessHelper::Quick
     )
-
-else()
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        Qt::Quick
-        Qt::SerialPort
-        Qt::WebView
-        Qt::Core5Compat
-        RibbonUI
-        sm_crypto
-        FramelessHelper::Core
-        FramelessHelper::Quick
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        RIBBONUI_BUILD_STATIC_LIB
     )
-
 endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt::Quick
+    Qt::SerialPort
+    Qt::WebView
+    Qt::Core5Compat
+    RibbonUI
+    sm_crypto
+    FramelessHelper::Core
+    FramelessHelper::Quick
+)
+
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_lupdate)
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_lrelease)
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
