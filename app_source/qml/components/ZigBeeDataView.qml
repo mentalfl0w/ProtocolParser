@@ -103,16 +103,12 @@ Item{
         height: parent.height
         RibbonMessageListView{
             id: data_view
+            anchors.fill: parent
             top_padding: control.top_padding + data_title_bar.height + (!RibbonTheme.modern_style ? 10 : 0)
             bottom_padding: bottom_bar.height
-            width: parent.width / 2
             delegate: ZigBeeMessage{
                 show_tooltip: control.show_tooltip
                 component_width: data_view.width / 2
-            }
-            view.onHeightChanged: {
-                if (control.auto_scroll_to_bottom)
-                    scroll_to_bottom()
             }
             Event{
                 id:data_view_event

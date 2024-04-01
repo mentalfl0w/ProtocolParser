@@ -44,7 +44,6 @@ set(
 
 set(
     qml_files qml/Main.qml qml/components/ZigBeeFrame.qml
-    qml/components/RibbonMessageListView.qml qml/components/RibbonMessage.qml
     qml/components/ZigBeeMessage.qml qml/components/SerialPortAssistant.qml
     qml/components/ZigBeeDataView.qml qml/components/TabBar.qml qml/components/CenterView.qml
     qml/components/ListTable.qml qml/components/DeviceList.qml qml/components/KeysList.qml
@@ -153,6 +152,25 @@ if(RIBBONUI_BUILD_STATIC_LIB)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         RIBBONUI_BUILD_STATIC_LIB
     )
+else()
+    if(WIN32)
+        if (MINGW)
+            add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${RIBBONUI_QML_PLUGIN_DIRECTORY}/RibbonUI.dll"
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        else()
+            if (NOT RIBBONUI_BUILD_STATIC_LIB)
+                if (CMAKE_BUILD_TYPE MATCHES "Debug")
+                    set(DEBUG_POSTFIX "d")
+                endif()
+                add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${RIBBONUI_QML_PLUGIN_DIRECTORY}/RibbonUI${DEBUG_POSTFIX}.dll"
+                    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+            endif()
+        endif()
+    endif()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
