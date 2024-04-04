@@ -5,26 +5,24 @@ import RibbonUI
 import ProtocolParser
 import "."
 
-Item {
-    id:root
-    implicitHeight: 550
-    implicitWidth: 550
-    property string title: qsTr("帮助")
+RibbonWindow {
+    id: root
+    height: 550
+    width: 550
+    title_bar.show_darkmode_btn: false
+    title_bar.show_style_switch: false
+    title: qsTr("帮助")
     Component.onCompleted: Tools.writeDirtoTempDir(":/qt/qml/ProtocolParser/")
-
-    RibbonText{
-        anchors{
-            top:parent.top
-            topMargin: 10
-            horizontalCenter: parent.horizontalCenter
-        }
-        text: title
-    }
 
     RibbonMarkDownViewer{
         id: viewer
         anchors.fill: parent
-        anchors.margins: 35
+        anchors{
+            topMargin: 10
+            leftMargin: anchors.topMargin
+            rightMargin: anchors.topMargin
+            bottomMargin: viewer.can_goback || viewer.can_goforward ? 30 : 10
+        }
         file_name: 'qrc:/qt/qml/ProtocolParser/README.md'
         base_url: 'qrc:/qt/qml/ProtocolParser/'
         resource_dir: Tools.baseDir
@@ -32,10 +30,11 @@ Item {
 
     RibbonButton{
         anchors{
-            bottom: root.bottom
-            bottomMargin: 10
-            left: root.left
-            leftMargin: 30
+            topMargin: 5
+            bottom: parent.bottom
+            bottomMargin: 5
+            left: parent.left
+            leftMargin: viewer.anchors.leftMargin
         }
         show_bg: false
         show_hovered_bg: false
@@ -48,10 +47,11 @@ Item {
 
     RibbonButton{
         anchors{
-            bottom: root.bottom
-            bottomMargin: 10
-            right: root.right
-            rightMargin: 30
+            topMargin: 5
+            bottom: parent.bottom
+            bottomMargin: 5
+            right: parent.right
+            rightMargin: viewer.anchors.rightMargin
         }
         show_bg: false
         show_hovered_bg: false

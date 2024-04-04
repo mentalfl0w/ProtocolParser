@@ -12,6 +12,7 @@ RibbonWindow {
     minimumWidth: 1200
     height: 800
     minimumHeight: 800
+    comfirmed_quit: true
     title: qsTr("Protocol Parser") + ` V${PPAPP_Version}`
 
     title_bar.right_content:RowLayout{
@@ -27,7 +28,7 @@ RibbonWindow {
             text_color: title_bar.title_text_color
             text_color_reverse: false
             onClicked: {
-                Window.window.popup.show_content("qrc:/qt/qml/ProtocolParser/components/HelpView.qml")
+                root.show_window("qrc:/qt/qml/ProtocolParser/HelperWindow.qml")
             }
         }
     }

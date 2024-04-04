@@ -49,7 +49,7 @@ set(
     qml/components/ZigBeeDataView.qml qml/components/TabBar.qml qml/components/CenterView.qml
     qml/components/ListTable.qml qml/components/DeviceList.qml qml/components/KeysList.qml
     qml/components/EventsHistoryList.qml qml/components/FrameChooser.qml qml/components/RibbonMarkDownViewer.qml
-    qml/components/HelpView.qml
+    qml/HelperWindow.qml
 )
 
 set(js_files js/markdown-it.js js/markdown-it-deflist.js js/markdown-it-emoji.js
