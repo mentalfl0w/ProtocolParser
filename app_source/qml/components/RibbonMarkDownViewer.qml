@@ -30,7 +30,6 @@ Item {
         anchors{
             top: parent.top
             left: parent.left
-            margins: 30
         }
         width: parent.width
         height: parent.height
@@ -54,8 +53,8 @@ Item {
             }
             else if (request.status === WebView.LoadSucceededStatus)
             {
-                viewer.width = parent.width - (anchors.margins * 2)
-                viewer.height = parent.height - (anchors.margins * 2)
+                viewer.width += 1 // This is a trick for making the viewer's width and height shows correct.
+                viewer.width -= 1
                 viewer.runJavaScript(`document.body.scrollTop = ${viewer.pre_height};`)
                 get_height()
             }

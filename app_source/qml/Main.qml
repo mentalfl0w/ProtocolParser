@@ -27,10 +27,9 @@ RibbonWindow {
             text_color: title_bar.title_text_color
             text_color_reverse: false
             onClicked: {
-                show_popup("qrc:/qt/qml/ProtocolParser/components/HelpView.qml")
+                Window.window.popup.show_content("qrc:/qt/qml/ProtocolParser/components/HelpView.qml")
             }
         }
-
     }
 
     CenterView{

@@ -38,18 +38,6 @@ Item {
         }
     }
 
-    RibbonButton{
-        anchors{
-            top:parent.top
-            margins: 4
-            right:parent.right
-        }
-        show_bg: false
-        show_hovered_bg: false
-        icon_source: RibbonIcons.Dismiss
-        onClicked: popup.close()
-    }
-
     ColumnLayout{
         id:list_layout
         anchors{

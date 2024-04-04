@@ -20,8 +20,9 @@ endif()
 
 set(QML_IMPORT_PATH ${CMAKE_BINARY_DIR}/app_source CACHE STRING "Qt Creator extra QML import paths" FORCE)
 
+string(TIMESTAMP TIME_YEAR %Y)
 set(PROJECT_COMPANY "Mentalflow's Lab")
-set(PROJECT_COPYRIGHT "Copyright (c) 2023 Mentalflow's Lab. All rights reserved.")
+set(PROJECT_COPYRIGHT "Copyright (c) ${TIME_YEAR} Mentalflow's Lab. All rights reserved.")
 set(PROJECT_DOMAIN "dev.ourdocs.cn.protocolparser")
 set(PROJECT_BUNDLE_NAME ${PROJECT_NAME})
 set(version_str "${CMAKE_PROJECT_VERSION_MAJOR},${CMAKE_PROJECT_VERSION_MINOR},${CMAKE_PROJECT_VERSION_PATCH}")
@@ -63,7 +64,7 @@ set(doc_files ${CMAKE_SOURCE_DIR}/README.md ${CMAKE_SOURCE_DIR}/documents/protoc
     ${CMAKE_SOURCE_DIR}/documents/pictures/home-light.png ${CMAKE_SOURCE_DIR}/app_source/resources/imgs/icon.png
 )
 
-INCLUDE_DIRECTORIES(dlln3x include)
+include_directories(dlln3x include)
 add_subdirectory(sm_crypto)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -73,27 +74,37 @@ else()
 endif()
 
 if (WIN32)
-    set(app_icon_resource_windows resources/icon.rc)
+    configure_file(.cmake/win_app.rc.in ${CMAKE_BINARY_DIR}/win_app.rc)
+    set(app_icon_resource_windows ${CMAKE_BINARY_DIR}/win_app.rc)
     qt_add_executable(${PROJECT_NAME}
         ${sources_files}
-        resources/icon.rc
+        ${app_icon_resource_windows}
     )
-file(TO_CMAKE_PATH "/" PATH_SEPARATOR)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(DLLPATH ../3rdparty/msvc/*.dll)
-else()
-    set(DLLPATH ../3rdparty/mingw/*.dll)
-endif()
-string(REPLACE "/" ${PATH_SEPARATOR} DLLPATH "${DLLPATH}")
-file(GLOB DLL_FILES ${DLLPATH})
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    ${DLL_FILES}
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-)
+    file(TO_CMAKE_PATH "/" PATH_SEPARATOR)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+        set(DLLPATH ${CMAKE_SOURCE_DIR}/3rdparty/msvc/*.dll)
+    else()
+        set(DLLPATH ${CMAKE_SOURCE_DIR}/3rdparty/mingw/*.dll)
+    endif()
+    string(REPLACE "/" ${PATH_SEPARATOR} DLLPATH "${DLLPATH}")
+    file(GLOB DLL_FILES ${DLLPATH})
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${DLL_FILES}
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    )
 elseif(APPLE)
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER ${PROJECT_DOMAIN})
+    set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_BUNDLE_NAME})
+    set(MACOSX_BUNDLE_COPYRIGHT ${PROJECT_COPYRIGHT})
+    set(MACOSX_BUNDLE_DEVELOPMENT_REGION "Chinese")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum OS X deployment version" FORCE)
+    set(MACOSX_BUNDLE_EXECUTABLE_NAME ${PROJECT_BUNDLE_NAME})
     set(MACOSX_BUNDLE_ICON_FILE AppIcon)
-    set(App_ICON "resources/imgs/AppIcon.icns")
+    configure_file(.cmake/MacOSXBundleInfo.plist.in ${CMAKE_BINARY_DIR}/Info.plist)
+    set(App_ICON "${PROJECT_SOURCE_DIR}/resources/imgs/AppIcon.icns")
     set_source_files_properties(${App_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     qt_add_executable(${PROJECT_NAME}
         ${sources_files}
@@ -130,11 +141,7 @@ qt_add_qml_module(${PROJECT_NAME}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER ${PROJECT_DOMAIN}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_BUNDLE_NAME}
-    MACOSX_BUNDLE_COPYRIGHT ${PROJECT_COPYRIGHT}
+    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_BINARY_DIR}/Info.plist
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
     OUTPUT_NAME ${PROJECT_BUNDLE_NAME}
@@ -180,8 +187,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt::Core5Compat
     RibbonUI
     sm_crypto
-    FramelessHelper::Core
-    FramelessHelper::Quick
 )
 
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_lupdate)

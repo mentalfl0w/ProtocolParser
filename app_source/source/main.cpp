@@ -11,9 +11,8 @@ Q_IMPORT_QML_PLUGIN(RibbonUIPlugin)
 #endif
 int main(int argc, char *argv[])
 {
-    RibbonUI::init();
     QtWebView::initialize();
-    FramelessHelper::Quick::initialize();
+    RibbonUI::init();
     QGuiApplication app(argc, argv);
     QTranslator translator;
     bool result = translator.load(QLocale::system(), u""_qs, u""_qs, u":/translations"_qs);

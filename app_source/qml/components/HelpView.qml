@@ -12,18 +12,6 @@ Item {
     property string title: qsTr("帮助")
     Component.onCompleted: Tools.writeDirtoTempDir(":/qt/qml/ProtocolParser/")
 
-    RibbonButton{
-        anchors{
-            top:parent.top
-            margins: 4
-            right:parent.right
-        }
-        show_bg: false
-        show_hovered_bg: false
-        icon_source: RibbonIcons.Dismiss
-        onClicked: popup.close()
-    }
-
     RibbonText{
         anchors{
             top:parent.top
@@ -36,6 +24,7 @@ Item {
     RibbonMarkDownViewer{
         id: viewer
         anchors.fill: parent
+        anchors.margins: 35
         file_name: 'qrc:/qt/qml/ProtocolParser/README.md'
         base_url: 'qrc:/qt/qml/ProtocolParser/'
         resource_dir: Tools.baseDir
