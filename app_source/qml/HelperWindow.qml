@@ -9,7 +9,6 @@ RibbonWindow {
     id: root
     height: 550
     width: 550
-    flags: Qt.Window
     title_bar.show_darkmode_btn: false
     title_bar.show_style_switch: false
     title: qsTr("帮助")
