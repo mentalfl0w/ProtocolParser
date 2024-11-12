@@ -453,13 +453,13 @@ QString ZigBeeDataResolver::sensor_data_reader(void **data,QString type)
     }
     else if (type=="float")
     {
-        d = QString::number(*(float*)(*data), 'g', 1);
+        d = QString::number(*(float*)(*data), 'f', 3);
         *pdata += sizeof(float);
         return d;
     }
     else if (type=="double")
     {
-        d = QString::number(*(double*)(*data), 'g', 1);
+        d = QString::number(*(double*)(*data), 'f', 3);
         *pdata += sizeof(double);
         return d;
     }
