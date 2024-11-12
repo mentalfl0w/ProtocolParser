@@ -57,7 +57,7 @@ jobs:
           # 拷贝依赖
           sudo macdeployqt /Users/runner/work/ProtocolParser/ProtocolParser/build/app/release/${targetName}.app -qmldir=. -verbose=1 -dmg
           
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.targetName }}_${{ matrix.os }}_${{matrix.qt_ver}}_shared.zip
           path: /Users/runner/work/ProtocolParser/ProtocolParser/build/app/release/${{ env.targetName }}.dmg
